@@ -1,0 +1,7 @@
+"0","raw_data$month_group <- cut(as.numeric(raw_data$duree_cdd),"
+"0","                               breaks = c(0, 6, 12, 24, Inf),"
+"0","                               labels = c(""1-6"", ""7-12"", ""13-24"", ""25+""),"
+"0","                               right = FALSE)"
+"0",""
+"0",""
+"0","boxplot(raw_data$salaire ~ raw_data$month_group, data = raw_data)"

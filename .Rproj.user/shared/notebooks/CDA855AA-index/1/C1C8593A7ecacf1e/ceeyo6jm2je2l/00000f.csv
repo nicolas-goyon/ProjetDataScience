@@ -1,0 +1,7 @@
+"0",""
+"0","ordered_data <- raw_data[order(as.numeric(raw_data$duree_cdd)), ]"
+"0",""
+"0",""
+"0",""
+"0",""
+"0","boxplot(raw_data$salaire ~ as.numeric(raw_data$duree_cdd), data = ordered_data)"
