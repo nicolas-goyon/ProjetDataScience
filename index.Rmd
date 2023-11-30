@@ -1,5 +1,8 @@
 ---
 title: "My Website"
+output:
+  html_document:
+    df_print: paged
 ---
 
 # Librairies
@@ -30,26 +33,69 @@ raw_data[, setdiff(names(raw_data), numericColumn)] <- lapply(raw_data[, setdiff
 raw_data$Date <- as.Date(raw_data$Date)
 ```
 
-```{r affichageSummaryRawData}
+```{r affichageSummaryRawData, echo=FALSE, eval=FALSE}
 summary(raw_data)
+```
+
+## Renommage de valeurs 
+
+```{r renomageData1}
+# Correspondence table
+correspondence_table <- data.frame(Key = 
+   c(
+    "CDI (contrat de travail à durée indéterminée) y compris de la fonction publique", 
+    "CDIC (contrat de travail à durée indéterminée de chantier ou d'opération)", 
+    "CDD (contrat de travail à durée déterminée) y compris de la fonction publique", 
+    "Saisonnière",
+    "Interim"
+  ),
+  Value = c(
+    "CDI", 
+    "CDIC", 
+    "CDD", 
+    "Saisonnière",
+    "Interim"
+    
+  )
+)
+
+
+# Function to edit values based on correspondence table
+edit_column <- function(data, column_name, correspondence_table) {
+  data[[column_name]] <- correspondence_table$Value[match(data[[column_name]], correspondence_table$Key)]
+  return(data)
+}
+columnToChange = "nature_du_contrat"
+# Apply the function to edit the 'City' column
+edited_data <- edit_column(raw_data, columnToChange, correspondence_table)
+raw_data <- edited_data
+```
+## Fonction de filtre 
+```{r fonctionFiltre}
+remove_rows_by_value <- function(data, column_name, value_to_remove) {
+  data_filtered <- subset(data, !(data[[column_name]] == value_to_remove))
+  return(data_filtered)
+}
 ```
 
 # Première étude 
 
+## Disparité homme/femme - toute formation confondue
 ```{r etude1}
 boxplot(raw_data$salaire ~ raw_data$Genre)
 ```
-
+## Disparité sur les dates d'optention du diplôme
 
 ```{r etude2}
 boxplot(raw_data$salaire ~ raw_data$annee_optention_diplome)
 ```
-
+## Disparité formation initiale/apprentissage/contrat de professionalisation
 ```{r etude3}
 boxplot(raw_data$salaire ~ raw_data$type_formation)
 ```
 
 
+## Disparité des filières
 
 ```{r etude4}
 boxplot(raw_data$salaire ~ raw_data$formation)
@@ -59,7 +105,7 @@ boxplot(raw_data$salaire ~ raw_data$formation)
 
 
 
-
+## Disparité en activité professionnelle ou en création d'entreprise
 
 ```{r etude5}
 boxplot(raw_data$salaire ~ raw_data$situation_actuelle)
@@ -69,59 +115,70 @@ boxplot(raw_data$salaire ~ raw_data$situation_actuelle)
 
 
 
-
+## Disparité salarié/indépendants
 ```{r etude6}
 boxplot(raw_data$salaire ~ raw_data$salarie_ou_non)
 ```
 
 
+## Disparité par nature du contrat
+```{r etude7, warning=FALSE}
+filtered_data <- remove_rows_by_value(raw_data, "situation_actuelle", "En recherche emploi")
+filtered_data <- remove_rows_by_value(filtered_data, "situation_actuelle", "En poursuite d'études (hors thèse) / en formation")
+filtered_data <- remove_rows_by_value(filtered_data, "situation_actuelle", "En thèse / PhD")
+filtered_data <- remove_rows_by_value(filtered_data, "situation_actuelle", "Sans activité volontairement") 
+filtered_data <- remove_rows_by_value(filtered_data, "situation_actuelle", "En volontariat (VIE, VIA, Volontariat civil..)")
+filtered_data <- remove_rows_by_value(filtered_data, "situation_actuelle", "En création d'entreprise /reprise d'entreprise")
 
-```{r etude7}
-boxplot(raw_data$salaire ~ raw_data$nature_du_contrat)
+ggplot(filtered_data, aes(x = nature_du_contrat, y = salaire)) +
+  geom_boxplot() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 8)) +
+  labs(title = "Salary Distribution by Contract Type", x = "Contract Type", y = "Salary")
+
 ```
 
 
 
 
 
+## Distribution du salaire en fonction de l'ancienneté 
 
 Trier les données de durée du cdd avant 
 ```{r etude8}
-
 ordered_data <- raw_data[order(as.numeric(raw_data$duree_cdd)), ]
-
-
-
 
 boxplot(raw_data$salaire ~ as.numeric(raw_data$duree_cdd), data = ordered_data)
 ```
-
-```{r etude8}
-raw_data$month_group <- cut(as.numeric(raw_data$duree_cdd),
+## Distribution du salaire en fonction de l'ancienneté (Groupée)
+```{r etude9}
+monthGroup <- cut(as.numeric(raw_data$duree_cdd),
                                breaks = c(0, 6, 12, 24, Inf),
                                labels = c("1-6", "7-12", "13-24", "25+"),
                                right = FALSE)
 
 
-boxplot(raw_data$salaire ~ raw_data$month_group, data = raw_data)
+boxplot(raw_data$salaire ~ monthGroup, data = raw_data)
 ```
 
-
-```{r etude9}
+## Distribution du salaire en fonction de France/étranger
+```{r etude10}
 boxplot(raw_data$salaire ~ raw_data$emploi_en_france)
 ```
 
+## Distribution du salaire en fonction du pays à l'étranger
+```{r etude11, warning=FALSE}
+raw_data_filtered <- raw_data[complete.cases(raw_data$emploi_etranger), ]
 
-```{r etude10, warning=FALSE}
-median_salaries <- tapply(raw_data$salaire, raw_data$emploi_etranger, median)
+
+median_salaries <- tapply(raw_data_filtered$salaire, raw_data_filtered$emploi_etranger, median)
 median_order <- names(sort(median_salaries))
 
-raw_data$emploi_etranger <- factor(raw_data$emploi_etranger, levels = median_order)
+emploiFactor <- factor(raw_data_filtered$emploi_etranger, levels = median_order)
 
 
 
-ggplot(raw_data, aes(x = emploi_etranger, y = salaire)) +
-  geom_boxplot() +
+ggplot(raw_data_filtered, aes(x = emploiFactor, y = salaire)) +
+  geom_boxplot(na.rm = TRUE) +
   theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 8)) +
   labs(title = "Salary Distribution by Country", x = "Country", y = "Salary")
 ```

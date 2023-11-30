@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+
+
+<title>My Website</title>
+
+<script src="site_libs/header-attrs-2.25/header-attrs.js"></script>
+<script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/bootstrap.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<link href="site_libs/pagedtable-1.1/css/pagedtable.css" rel="stylesheet" />
+<script src="site_libs/pagedtable-1.1/js/pagedtable.js"></script>
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+details > summary > p:only-child {
+  display: inline;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark the anchor link active (and if it's in a dropdown, also mark that active)
+  var dropdown = menuAnchor.closest('li.dropdown');
+  if (window.bootstrap) { // Bootstrap 4+
+    menuAnchor.addClass('active');
+    dropdown.find('> .dropdown-toggle').addClass('active');
+  } else { // Bootstrap 3
+    menuAnchor.parent().addClass('active');
+    dropdown.addClass('active');
+  }
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before, .tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "\e259";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "\e258";
+  font-family: 'Glyphicons Halflings';
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-bs-toggle="collapse" data-target="#navbar" data-bs-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">My Website</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li>
+  <a href="about.html">About</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+
+
+<h1 class="title toc-ignore">My Website</h1>
+
+</div>
+
+
+<div id="librairies" class="section level1">
+<h1>Librairies</h1>
+<pre class="r"><code>if (!requireNamespace(&quot;ggplot2&quot;, quietly = TRUE)) {
+  install.packages(&quot;ggplot2&quot;)
+}
+library(ggplot2)</code></pre>
+<pre><code>## Warning: package &#39;ggplot2&#39; was built under R version 4.2.3</code></pre>
+</div>
+<div id="récupération-des-données" class="section level1">
+<h1>Récupération des données</h1>
+<pre class="r"><code>raw_data &lt;- read.csv(&quot;output_file.csv&quot;)</code></pre>
+<p>Définir toutes les données comme caractère (variable qualitative)
+sauf le salaire</p>
+<pre class="r"><code># Name of the numeric column
+numericColumn &lt;- &quot;salaire&quot;
+
+# Convert all columns to character except the numeric column
+raw_data[, setdiff(names(raw_data), numericColumn)] &lt;- lapply(raw_data[, setdiff(names(raw_data), numericColumn)], as.character)
+
+raw_data$Date &lt;- as.Date(raw_data$Date)</code></pre>
+<div id="renommage-de-valeurs" class="section level2">
+<h2>Renommage de valeurs</h2>
+<pre class="r"><code># Correspondence table
+correspondence_table &lt;- data.frame(Key = 
+   c(
+    &quot;CDI (contrat de travail à durée indéterminée) y compris de la fonction publique&quot;, 
+    &quot;CDIC (contrat de travail à durée indéterminée de chantier ou d&#39;opération)&quot;, 
+    &quot;CDD (contrat de travail à durée déterminée) y compris de la fonction publique&quot;, 
+    &quot;Saisonnière&quot;,
+    &quot;Interim&quot;
+  ),
+  Value = c(
+    &quot;CDI&quot;, 
+    &quot;CDIC&quot;, 
+    &quot;CDD&quot;, 
+    &quot;Saisonnière&quot;,
+    &quot;Interim&quot;
+    
+  )
+)
+
+
+# Function to edit values based on correspondence table
+edit_column &lt;- function(data, column_name, correspondence_table) {
+  data[[column_name]] &lt;- correspondence_table$Value[match(data[[column_name]], correspondence_table$Key)]
+  return(data)
+}
+columnToChange = &quot;nature_du_contrat&quot;
+# Apply the function to edit the &#39;City&#39; column
+edited_data &lt;- edit_column(raw_data, columnToChange, correspondence_table)
+raw_data &lt;- edited_data</code></pre>
+</div>
+<div id="fonction-de-filtre" class="section level2">
+<h2>Fonction de filtre</h2>
+<pre class="r"><code>remove_rows_by_value &lt;- function(data, column_name, value_to_remove) {
+  data_filtered &lt;- subset(data, !(data[[column_name]] == value_to_remove))
+  return(data_filtered)
+}</code></pre>
+</div>
+</div>
+<div id="première-étude" class="section level1">
+<h1>Première étude</h1>
+<div id="disparité-hommefemme---toute-formation-confondue"
+class="section level2">
+<h2>Disparité homme/femme - toute formation confondue</h2>
+<pre class="r"><code>boxplot(raw_data$salaire ~ raw_data$Genre)</code></pre>
+<p><img src="index_files/figure-html/etude1-1.png" width="672" /> ##
+Disparité sur les dates d’optention du diplôme</p>
+<pre class="r"><code>boxplot(raw_data$salaire ~ raw_data$annee_optention_diplome)</code></pre>
+<p><img src="index_files/figure-html/etude2-1.png" width="672" /> ##
+Disparité formation initiale/apprentissage/contrat de
+professionalisation</p>
+<pre class="r"><code>boxplot(raw_data$salaire ~ raw_data$type_formation)</code></pre>
+<p><img src="index_files/figure-html/etude3-1.png" width="672" /></p>
+</div>
+<div id="disparité-des-filières" class="section level2">
+<h2>Disparité des filières</h2>
+<pre class="r"><code>boxplot(raw_data$salaire ~ raw_data$formation)</code></pre>
+<p><img src="index_files/figure-html/etude4-1.png" width="672" /></p>
+</div>
+<div
+id="disparité-en-activité-professionnelle-ou-en-création-dentreprise"
+class="section level2">
+<h2>Disparité en activité professionnelle ou en création
+d’entreprise</h2>
+<pre class="r"><code>boxplot(raw_data$salaire ~ raw_data$situation_actuelle)</code></pre>
+<p><img src="index_files/figure-html/etude5-1.png" width="672" /></p>
+</div>
+<div id="disparité-salariéindépendants" class="section level2">
+<h2>Disparité salarié/indépendants</h2>
+<pre class="r"><code>boxplot(raw_data$salaire ~ raw_data$salarie_ou_non)</code></pre>
+<p><img src="index_files/figure-html/etude6-1.png" width="672" /></p>
+</div>
+<div id="disparité-par-nature-du-contrat" class="section level2">
+<h2>Disparité par nature du contrat</h2>
+<pre class="r"><code>filtered_data &lt;- remove_rows_by_value(raw_data, &quot;situation_actuelle&quot;, &quot;En recherche emploi&quot;)
+filtered_data &lt;- remove_rows_by_value(filtered_data, &quot;situation_actuelle&quot;, &quot;En poursuite d&#39;études (hors thèse) / en formation&quot;)
+filtered_data &lt;- remove_rows_by_value(filtered_data, &quot;situation_actuelle&quot;, &quot;En thèse / PhD&quot;)
+filtered_data &lt;- remove_rows_by_value(filtered_data, &quot;situation_actuelle&quot;, &quot;Sans activité volontairement&quot;) 
+filtered_data &lt;- remove_rows_by_value(filtered_data, &quot;situation_actuelle&quot;, &quot;En volontariat (VIE, VIA, Volontariat civil..)&quot;)
+filtered_data &lt;- remove_rows_by_value(filtered_data, &quot;situation_actuelle&quot;, &quot;En création d&#39;entreprise /reprise d&#39;entreprise&quot;)
+
+ggplot(filtered_data, aes(x = nature_du_contrat, y = salaire)) +
+  geom_boxplot() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 8)) +
+  labs(title = &quot;Salary Distribution by Contract Type&quot;, x = &quot;Contract Type&quot;, y = &quot;Salary&quot;)</code></pre>
+<p><img src="index_files/figure-html/etude7-1.png" width="672" /></p>
+</div>
+<div id="distribution-du-salaire-en-fonction-de-lancienneté"
+class="section level2">
+<h2>Distribution du salaire en fonction de l’ancienneté</h2>
+<p>Trier les données de durée du cdd avant</p>
+<pre class="r"><code>ordered_data &lt;- raw_data[order(as.numeric(raw_data$duree_cdd)), ]
+
+boxplot(raw_data$salaire ~ as.numeric(raw_data$duree_cdd), data = ordered_data)</code></pre>
+<p><img src="index_files/figure-html/etude8-1.png" width="672" /> ##
+Distribution du salaire en fonction de l’ancienneté (Groupée)</p>
+<pre class="r"><code>monthGroup &lt;- cut(as.numeric(raw_data$duree_cdd),
+                               breaks = c(0, 6, 12, 24, Inf),
+                               labels = c(&quot;1-6&quot;, &quot;7-12&quot;, &quot;13-24&quot;, &quot;25+&quot;),
+                               right = FALSE)
+
+
+boxplot(raw_data$salaire ~ monthGroup, data = raw_data)</code></pre>
+<p><img src="index_files/figure-html/etude9-1.png" width="672" /></p>
+</div>
+<div id="distribution-du-salaire-en-fonction-de-franceétranger"
+class="section level2">
+<h2>Distribution du salaire en fonction de France/étranger</h2>
+<pre class="r"><code>boxplot(raw_data$salaire ~ raw_data$emploi_en_france)</code></pre>
+<p><img src="index_files/figure-html/etude10-1.png" width="672" /></p>
+</div>
+<div id="distribution-du-salaire-en-fonction-du-pays-à-létranger"
+class="section level2">
+<h2>Distribution du salaire en fonction du pays à l’étranger</h2>
+<pre class="r"><code>raw_data_filtered &lt;- raw_data[complete.cases(raw_data$emploi_etranger), ]
+
+
+median_salaries &lt;- tapply(raw_data_filtered$salaire, raw_data_filtered$emploi_etranger, median)
+median_order &lt;- names(sort(median_salaries))
+
+emploiFactor &lt;- factor(raw_data_filtered$emploi_etranger, levels = median_order)
+
+
+
+ggplot(raw_data_filtered, aes(x = emploiFactor, y = salaire)) +
+  geom_boxplot(na.rm = TRUE) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 8)) +
+  labs(title = &quot;Salary Distribution by Country&quot;, x = &quot;Country&quot;, y = &quot;Salary&quot;)</code></pre>
+<p><img src="index_files/figure-html/etude11-1.png" width="672" /></p>
+</div>
+</div>
+
+
+
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
