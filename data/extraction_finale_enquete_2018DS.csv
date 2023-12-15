@@ -393,7 +393,7 @@ Date;identifiant;Genre;Annee_diplome;Type_formation;Filiere;Situation;Secteur;Na
 26/03/2018 12:44;1894306484834410;Femme;2016;Professionalisation;GBA;Activite;Prive;CDI;En France;Nouvelle-Aquitaine;;19;Lindt & Sprungli ;250 à  4 999 salarié(e)s ;Production - Exploitation ;Chef d équipe ;Industrie agroalimentaire ;36000;OUI;NON;OUI;OUI;4;5;5;5;5
 26/03/2018 13:23;1876615329620930;Femme;2017;Professionalisation;GBA;Activite;Prive;CDI;En France;Provence-Alpes-Côte d'Azur;;4;OPA DISTRIBUTION;De 10 à 19 salarié(e)s ;Qualité, sécurité, sûreté de fonctionnement ;Responsable qualité;Commerce;33000;NON;OUI;OUI;OUI;4;5;4;4;5
 26/03/2018 13:44;1813820725867770;Homme;2015;Initiale;GBA;Activite;Prive;CDI;A l'étranger;;Suisse;25;Roche Glycart AG;5 000 salarié(e)s ou plus;Recherche-développement, études scientifiques et techniques (autre qu'informatique);Senior Associate;Industrie pharmaceutique;72000;NON;OUI;NON;OUI;5;5;5;4;4
-26/03/2018 13:48;84509804001426;Femme;2016;Initiale;GBA;Recherche;;;;;;;;;;;;;;;;;;;;;
+26/03/2018 13:48;8,45098E+13;Femme;2016;Initiale;GBA;Recherche;;;;;;;;;;;;;;;;;;;;;
 26/03/2018 17:53;1794282953977130;Femme;2015;Initiale;GBA;Activite;Prive;CDI;En France;Île-de-France;;11;RICHARD VINS ET DOMAINES;De 50 à 249 salarié(e)s ;Qualité, sécurité, sûreté de fonctionnement ;Ingénieur qualité produits et hygiène;Industrie agroalimentaire ;39000;NON;NON;OUI;OUI;5;5;3;5;3
 26/03/2018 21:07;1767362704614120;Homme;2017;Initiale;GBA;Activite;Prive;CDD;En France;Pays de la Loire;;3;Eurofins;5 000 salarié(e)s ou plus;Production - Exploitation ;Technicien de laboratoire;Autres activités spécialisées, scientifiques et techniques;18120;NON;NON;NON;NON;2;4;2;2;5
 26/03/2018 22:40;1888802842849220;Femme;2017;Professionalisation;GBA;Activite;Prive;CTT;En France;Grand Est;;7;Entremont;250 à  4 999 salarié(e)s ;Qualité, sécurité, sûreté de fonctionnement ;Animatrice Qualité;Industrie agroalimentaire ;26000;NON;NON;NON;NON;2;3;3;3;2
@@ -651,7 +651,7 @@ Date;identifiant;Genre;Annee_diplome;Type_formation;Filiere;Situation;Secteur;Na
 18/05/2018 11:55;1798487182527800;Homme;2017;Initiale;GBA;Recherche;;;;;;;;;;;;;;;;;;;;;
 18/05/2018 11:48;1788640536752860;Homme;2015;Initiale;MAT;Volontariat;;;;;;;;;;;;;;;;;;;;;
 18/05/2018 12:18;1793784813443180;Homme;2015;Initiale;MAT;Activite;Prive;CDI;En France;Île-de-France;;17;PROMAT FRANCE;De 50 à 249 salarié(e)s ;Assistance technique;Ingénieur assistance technique;Construction, BTP;33000;NON;NON;NON;OUI;4;4;4;4;3
-18/05/2018 13:07;69897000433602;Homme;2017;Initiale;GBA;Sans activité volontairement;;;;;;;;;;;;;;;;;;;;;
+18/05/2018 13:07;6,9897E+13;Homme;2017;Initiale;GBA;Sans activité volontairement;;;;;;;;;;;;;;;;;;;;;
 18/05/2018 14:02;1776551784277790;Homme;2017;Initiale;MAT;Volontariat;;;;;;;;;;;;;;;;;;;;;
 18/05/2018 17:01;1822549917121160;Homme;2017;Initiale;MAT;Activite;Prive;CDD;En France;Auvergne-Rhône-Alpes;;7;Astra plastique (RPC group);5 000 salarié(e)s ou plus;Recherche-développement, études scientifiques et techniques (autre qu'informatique);Chef de projet R&D ;Autres industries (bois, imprimerie, fabrication, réparation et installation de machines et d'équipements, ...);31000;NON;NON;NON;OUI;4;4;3;4;5
 18/05/2018 20:22;1867827346423290;Femme;2016;Initiale;STE;These;;;;;;;;;;;;;;;;;;;;;
