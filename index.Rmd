@@ -18,7 +18,7 @@ library(ggplot2)
 
 ```{r chargementData}
 # Trying ISO-8859-1
-raw_data <- read.csv("data/extraction_finale_enquete_2020DS.csv", sep = ";", fileEncoding = "ISO-8859-1")
+raw_data <- read.csv("data/data_2019.csv", sep = ",", fileEncoding = "UTF-8")
 ```
 
 
