@@ -448,24 +448,6 @@ ggplot(raw_data, aes(x = Region, y = Salaire_annuel)) +
 
 Le minimum étant pour la Corse avec 30 000€/an tandis-que l'ile-de-France est plus proche des 40 000€ à 45 000€, il y a un lien mais aucune région ne semble se distringuer particulièrement.
 
----
-title: "My Website"
-output:
-  html_document:
-    df_print: paged
-  pdf_document: default
----
-
-Commun
-
-Librairies
-
-{r libraries}
-if (!requireNamespace("ggplot2", quietly = TRUE)) {
-  install.packages("ggplot2")
-}
-library(ggplot2)
-
 Etude données 2020
 
 Récupération des données
