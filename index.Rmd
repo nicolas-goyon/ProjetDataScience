@@ -23,7 +23,7 @@ library(ggplot2)
 
 ```{r chargementData}
 # Trying ISO-8859-1
-raw_data <- read.csv("data/data_2018.csv", sep = ",")
+raw_data <- read.csv("data/data_2018.csv", sep = ";")
 ```
 
 
@@ -199,7 +199,7 @@ Ici les données sont trop faible pour de réelles interprétations, sauf pour l
 
 ```{r chargementData}
 # Trying ISO-8859-1
-raw_data <- read.csv("data/data_2019.csv", sep = ",", fileEncoding = "UTF-8")
+raw_data <- read.csv("data/data_2019.csv", sep = ";", fileEncoding = "UTF-8")
 ```
 
 
@@ -270,6 +270,9 @@ Les apprentis et les élèves en formation initiale semblent avoir des salaire s
 ```{r etude4}
 boxplot(raw_data$Salaire_annuel ~ raw_data$Filiere)
 ```
+
+En 2019, les salaires se basent principalement entre 30 000 et 40 000€ sans grosses variations.
+
 
 
 ### Filtrage des personnes en activité 
