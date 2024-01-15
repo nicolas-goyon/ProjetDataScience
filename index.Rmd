@@ -41,7 +41,7 @@ raw_data[factor_cols] <- lapply(raw_data[factor_cols], as.factor)
 raw_data[numeric_cols] <- lapply(raw_data[numeric_cols], as.numeric)
 ```
 
-```{r affichageSummaryRawData, echo=FALSE, eval=FALSE}
+```{r affichageSummaryRawData, eval=FALSE}
 summary(raw_data)
 ```
 
@@ -189,6 +189,58 @@ ggplot(raw_data_filtered, aes(x = emploiFactor, y = Salaire_annuel)) +
 
 
 Ici les données sont trop faible pour de réelles interprétations, sauf pour l'Irlande où les salaires ont l'air d'être bien plus haut que les salaires français. (ref diagramme précédent)
+
+### Distribution des salaires en fonction de la région
+
+```{r distributionRegion}
+# Remove rows with non-finite values in Salaire_annuel
+raw_data <- raw_data[!is.na(raw_data$Salaire_annuel) & is.finite(raw_data$Salaire_annuel), ]
+
+# Remove rows with non-finite values in other numeric columns if needed
+# raw_data <- raw_data[complete.cases(raw_data[, numeric_cols]), ]
+
+
+ordered_regions <- names(sort(tapply(raw_data$Salaire_annuel, raw_data$Region, median)))
+
+
+# Plotting the distribution of salaries based on region
+ggplot(raw_data, aes(x = Region, y = Salaire_annuel)) +
+  geom_boxplot() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  scale_x_discrete(limits = ordered_regions)+
+  labs(title = "Distribution des salaires en fonction de la région",
+       x = "Région",
+       y = "Salaire Annuel")
+
+```
+
+Le minimum étant pour la Corse avec 30 000€/an tandis-que l'ile-de-France est plus proche des 40 000€ à 45 000€, il y a un lien mais aucune région ne semble se distringuer particulièrement.
+
+
+
+### Distribution des salaires en fonction du secteur d'activité
+
+```{r secteurdactivite}
+# Order the regions based on the median salary
+ordered_departments <- names(sort(tapply(raw_data$Salaire_annuel, raw_data$Departement, median)))
+
+# Select the top 10 departments
+top_10_departments <- head(ordered_departments, 10)
+
+# Plotting the distribution of salaries based on region with ordered x-axis
+ggplot(raw_data, aes(x = reorder(Departement, Salaire_annuel, FUN = median), y = Salaire_annuel)) +
+  geom_boxplot() +
+  labs(title = "Distribution des salaires en fonction du département",
+       x = "Région",
+       y = "Salaire Annuel") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  scale_x_discrete(limits = top_10_departments)
+
+
+```
+
+Aucun département ne semble avoir suffisament de données pour être significatif. 
 
 
 
@@ -368,3 +420,30 @@ ggplot(raw_data_filtered, aes(x = emploiFactor, y = Salaire_annuel)) +
 
 
 Ici les données sont trop faible pour de réelles interprétations, sauf pour l'Irlande, le Royaume-Uni, Canada et Suisse où les salaires. Le Royaume-Uni semblant être proche de la France, cependant l'Irlande, Canada et Suisse ayant un salaire nêtement plus grand.
+
+
+### Distribution des salaires en fonction de la région
+
+```{r distributionRegion}
+# Remove rows with non-finite values in Salaire_annuel
+raw_data <- raw_data[!is.na(raw_data$Salaire_annuel) & is.finite(raw_data$Salaire_annuel), ]
+
+# Remove rows with non-finite values in other numeric columns if needed
+# raw_data <- raw_data[complete.cases(raw_data[, numeric_cols]), ]
+
+
+ordered_regions <- names(sort(tapply(raw_data$Salaire_annuel, raw_data$Region, median)))
+
+
+# Plotting the distribution of salaries based on region
+ggplot(raw_data, aes(x = Region, y = Salaire_annuel)) +
+  geom_boxplot() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  scale_x_discrete(limits = ordered_regions)+
+  labs(title = "Distribution des salaires en fonction de la région",
+       x = "Région",
+       y = "Salaire Annuel")
+
+```
+
+Le minimum étant pour la Corse avec 30 000€/an tandis-que l'ile-de-France est plus proche des 40 000€ à 45 000€, il y a un lien mais aucune région ne semble se distringuer particulièrement.
