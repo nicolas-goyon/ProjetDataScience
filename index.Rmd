@@ -305,7 +305,7 @@ ggplot(filtered_data, aes(x = Nature_contrat, y = Salaire_annuel)) +
 
 ```
 
-On peut remarquer que les CDI ont un net avantage de salaire comparé aux autres types de contrats, les CTT sont cependant légèrement au dessus des CDI.
+On peut remarquer que les cdi et contrats locaux ont un net avantages par rapport aux CDD et CTT.
 
 
 
@@ -335,7 +335,7 @@ monthGroup <- cut(as.numeric(raw_data$Anciennete),
 boxplot(raw_data$Salaire_annuel ~ monthGroup, data = raw_data)
 ```
 
-En regroupant l'ancienneté sur des périodes de 6 mois, on remarque une légère augmentation à partir de 7 mois, mais ce n'est pas significatif pour autant.
+En regroupant l'ancienneté sur des périodes de 6 mois, on ne remarque aucun changement significatif.
 
 
 ### Distribution du salaire en fonction de France/étranger
@@ -343,7 +343,7 @@ En regroupant l'ancienneté sur des périodes de 6 mois, on remarque une légèr
 boxplot(raw_data$Salaire_annuel ~ raw_data$France)
 ```
 
-Ici entre la france et l'étranger les données sont proches.
+Ici la France à tendance à être moins bien payé que l'étranger ainsi que l'étranger ayant une plus grande dispertion de salaires contraitement à l'étranger où les salaires sont plus rassemblés.
 
 
 
@@ -367,4 +367,4 @@ ggplot(raw_data_filtered, aes(x = emploiFactor, y = Salaire_annuel)) +
 ```
 
 
-Ici les données sont trop faible pour de réelles interprétations, sauf pour l'Irlande où les salaires ont l'air d'être bien plus haut que les salaires français. (ref diagramme précédent)
+Ici les données sont trop faible pour de réelles interprétations, sauf pour l'Irlande, le Royaume-Uni, Canada et Suisse où les salaires. Le Royaume-Uni semblant être proche de la France, cependant l'Irlande, Canada et Suisse ayant un salaire nêtement plus grand.
