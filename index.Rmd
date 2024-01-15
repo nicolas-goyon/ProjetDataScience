@@ -469,8 +469,9 @@ raw_data[factor_cols] <- lapply(raw_data[factor_cols], as.factor)
 
 # Convert columns to numeric
 raw_data[numeric_cols] <- lapply(raw_data[numeric_cols], as.numeric)
+```
 
-{r affichageSummaryRawData1, echo=FALSE, eval=FALSE}
+```{r affichageSummaryRawData1, echo=FALSE, eval=FALSE}
 summary(raw_data)
 ```
 
@@ -606,5 +607,3 @@ ggplot(raw_data_filtered, aes(x = emploiFactor, y = Salaire_annuel)) +
   ```
 
 Il n'y a pas assez de données pour faire des études plus importantes, on constate que c'est en Suisse que les diplomés de Polytech ont les meilleurs salaires contrairement à la Thaïlande.
-
-
