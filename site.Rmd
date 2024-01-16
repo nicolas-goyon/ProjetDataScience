@@ -1,0 +1,1410 @@
+---
+title: "My Website"
+output:
+  html_document:
+    df_print: paged
+---
+
+# Commun
+
+#Introduction 
+
+**Introduction**
+
+Notre projet de data science se penche attentivement sur l'insertion professionnelle des ingénieurs diplômés de Polytech Montpellier, en mettant l'accent sur l'évolution des salaires à 6, 18 et 30 mois après la fin des études. Au fil d'une étude, l'école a compilé des données variées, fournissant une toile de fond essentielle pour comprendre les tenants et aboutissants post-diplôme.
+
+Notre objectif central est de répondre à une question pratique : quels sont les paramètres qui impactent le salaire des diplômés à la sortie des études ? Pour cela, nous analyserons plusieurs variables telles que les filières d'études, les pays d'exercice professionnel, l'année d'obtention du diplôme, la localisation en France, le secteur d'emploi (privé ou public), le type d'entreprises, le genre des diplômés, ainsi que leurs responsabilités professionnelles.
+
+Notre méthodologie consiste à réaliser des études de corrélation année par année, suivies d'une analyse approfondie des paramètres jugés significatifs. L'objectif ultime est de définir avec précision quels sont les facteurs spécifiques qui influent sur le salaire des ingénieurs formés par Polytech Montpellier.
+
+## Librairies
+
+```{r libraries}
+if (!requireNamespace("ggplot2", quietly = TRUE)) {
+  install.packages("ggplot2")
+}
+library(ggplot2)
+```
+
+### Fonction de filtre 
+Ceci est une fonction utilisé après pour retirer différentes lignes en fonction des valeurs dans une certain colonne. (équivalent d'un select where)
+```{r fonctionFiltre}
+remove_rows_by_value <- function(data, column_name, value_to_remove) {
+  data_filtered <- subset(data, !(data[[column_name]] == value_to_remove))
+  return(data_filtered)
+}
+```
+
+# Etude données 2018
+
+## Récupération des données
+
+```{r chargementData}
+# Trying ISO-8859-1
+raw_data <- read.csv("data/data_2018.csv", sep = ";")
+```
+
+
+Définir toutes les données comme caractère (variable qualitative) sauf le salaire
+
+```{r colonnesQualitative}
+# Lists specifying which columns to convert to factors and numeric
+factor_cols <- c("Date", "Identifiant", "Genre", "Annee_diplome","Type_formation","Filiere","Situation","Secteur","Nature_contrat", "France","Region", "Pays", "Taille_entreprise", "Nom_entreprise", "Departement", "Intitule_poste", "Secteur_activite")
+numeric_cols <- c("Anciennete", "Salaire_annuel", "Responsabilite_hierarchique", "Responsabilite_budget", "Responsabilite_equipe", "Responsabilite_projet", "Satisfaction_globale", "Saitisfaction_relations", "Satisfaction_salaire", "Satisfaction_autonomie", "Satisfaction_localisation")
+
+# Convert columns to factors
+raw_data[factor_cols] <- lapply(raw_data[factor_cols], as.factor)
+
+# Convert columns to numeric
+raw_data[numeric_cols] <- lapply(raw_data[numeric_cols], as.numeric)
+```
+
+```{r affichageSummaryRawData, eval=FALSE}
+summary(raw_data)
+```
+
+Avec ces valeurs on peut déduire beaucoup de choses... 
+
+### Fonction de filtre 
+Ceci est une fonction utilisé après pour retirer différentes lignes en fonction des valeurs dans une certain colonne. (équivalent d'un select where)
+```{r fonctionFiltre}
+remove_rows_by_value <- function(data, column_name, value_to_remove) {
+  data_filtered <- subset(data, !(data[[column_name]] == value_to_remove))
+  return(data_filtered)
+}
+```
+
+## Première étude 
+
+### Disparité homme/femme - toute formation confondue
+```{r etude1}
+ggplot(raw_data, aes(x = Genre, y = Salaire_annuel, fill = Genre)) +
+  geom_boxplot(width = 0.5, notch = TRUE, outlier.shape = NA) +
+  labs(title = "Différences de salaire par genre",
+       x = "Genre",
+       y = "Salaire Annuel") +
+  theme_minimal() +
+  theme(legend.position = "none")
+```
+
+En 2018, on ne remarque pas de différence significative entre les hommes et les femmes.
+
+
+
+
+
+
+### Disparité sur les dates d'optention du diplôme
+
+```{r etude2}
+ggplot(raw_data, aes(x = Salaire_annuel, fill = as.factor(Annee_diplome))) +
+  geom_density(alpha = 0.5) +
+  labs(title = "Distribution des salaires par année de diplôme",
+       x = "Salaire Annuel",
+       fill = "Année de Diplôme") +
+  theme_minimal()
+```
+
+Plus l'année d'optention du diplôme est ancienne, il semblerait que plus le salaire est élevé, ce qui s'explique par l'ancienneté et l'expérience.
+
+
+
+
+### Disparité formation initiale/apprentissage/contrat de professionalisation
+```{r etude3}
+ggplot(raw_data, aes(x = as.factor(Type_formation), y = Salaire_annuel, fill = as.factor(Type_formation))) +
+  stat_summary(fun = "mean", geom = "col") +
+  labs(title = "Moyenne des salaires par type de formation",
+       x = "Type de Formation",
+       y = "Moyenne du Salaire Annuel",
+       fill = "Type de Formation") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+Les apprentis et les élèves en formation initiale semblent avoir des salaire similaires. Tandis que ceux en contrat de professionnalisation ont des salaires en moyenne similaire avec une plus grande disparité haute.
+
+
+
+
+### Disparité des filières
+
+```{r etude4}
+ggplot(raw_data, aes(x = Filiere, y = Salaire_annuel, fill = Filiere)) +
+  geom_violin(trim = FALSE, scale = "width", width = 0.8) +
+  geom_boxplot(width = 0.2, fill = "white", color = "black", outlier.shape = NA) +
+  labs(title = "Distribution des salaires par filière",
+       x = "Filière",
+       y = "Salaire Annuel",
+       fill = "Filière") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+
+### Filtrage des personnes en activité 
+```{r filtrage_activite}
+filtered_data <- remove_rows_by_value(raw_data, "Situation", "En recherche emploi")
+filtered_data <- remove_rows_by_value(filtered_data, "Situation", "En poursuite d'études (hors thèse) / en formation")
+filtered_data <- remove_rows_by_value(filtered_data, "Situation", "These")
+filtered_data <- remove_rows_by_value(filtered_data, "Situation", "Sans activité") 
+filtered_data <- remove_rows_by_value(filtered_data, "Situation", "Volontariat")
+filtered_data <- remove_rows_by_value(filtered_data, "Situation", "En création d'entreprise /reprise d'entreprise")
+filtered_data <- remove_rows_by_value(filtered_data, "Situation", "Etudes")
+
+activite_data <- filtered_data
+```
+
+
+
+### Disparité par nature du contrat
+```{r etude7, warning=FALSE}
+
+# Diagramme en boîte avec couleurs
+ggplot(filtered_data, aes(x = Nature_contrat, y = Salaire_annuel, fill = Nature_contrat)) +
+  geom_boxplot() +
+  scale_fill_manual(values = c("#66c2a5", "#fc8d62", "#8da0cb", "#e78ac3", "#a6d854")) +  # Choisissez vos couleurs
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 8)) +
+  labs(title = "Distribution des salaires par type de contrat", x = "Type de Contrat", y = "Salaire Annuel")
+
+
+```
+
+On peut remarquer que les CDI ont un net avantage de salaire comparé aux autres types de contrats, les CTT sont cependant légèrement au dessus des CDI.
+
+
+
+### Distribution du salaire en fonction de l'ancienneté 
+
+```{r etude8}
+
+
+
+ordered_data <- raw_data[order(as.numeric(raw_data$Anciennete)), ]
+
+boxplot(raw_data$Salaire_annuel ~ as.numeric(raw_data$Anciennete), data = ordered_data)
+```
+
+Il ne semble à priori pas avoir de lien entre l'ancienneté et le salaire sur les deux premières années, après cela, il manque des informations.
+
+
+
+### Distribution du salaire en fonction de l'ancienneté (Groupée)
+```{r etude9}
+monthGroup <- cut(as.numeric(raw_data$Anciennete),
+                               breaks = c(0, 6, 12, 24, Inf),
+                               labels = c("1-6", "7-12", "13-24", "25+"),
+                               right = FALSE)
+
+
+boxplot(raw_data$Salaire_annuel ~ monthGroup, data = raw_data)
+```
+
+En regroupant l'ancienneté sur des périodes de 6 mois, on remarque une légère augmentation à partir de 7 mois, mais ce n'est pas significatif pour autant.
+
+###Distribution du salaire selon le secteur
+
+```{r etude 1}
+boxplot(raw_data$Salaire_annuel ~ raw_data$Secteur)
+
+```
+
+###Distribution selon les responsabilités
+```{r etude 1}
+boxplot(raw_data$Salaire_annuel ~ raw_data$Responsabilite_hierarchique)
+
+```
+### Distribution du salaire en fonction de France/étranger
+```{r etude10}
+boxplot(raw_data$Salaire_annuel ~ raw_data$France)
+```
+
+Ici entre la france et l'étranger les données sont proches.
+
+
+
+
+### Distribution du salaire en fonction du pays à l'étranger
+```{r etude11, warning=FALSE}
+raw_data_filtered <- raw_data[complete.cases(raw_data$Pays) & raw_data$Pays != "" & !grepl("^\\s*$", raw_data$Pays) & !is.na(raw_data$Salaire_annuel), ]
+
+
+median_salaries <- tapply(raw_data_filtered$Salaire_annuel, raw_data_filtered$Pays, median)
+median_order <- names(sort(median_salaries))
+
+emploiFactor <- factor(raw_data_filtered$Pays, levels = median_order)
+
+
+
+ggplot(raw_data_filtered, aes(x = emploiFactor, y = Salaire_annuel)) +
+  geom_boxplot(na.rm = TRUE) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 8)) +
+  labs(title = "Salary Distribution by Country", x = "Country", y = "Salary")
+```
+
+
+Ici les données sont trop faible pour de réelles interprétations, sauf pour l'Irlande où les salaires ont l'air d'être bien plus haut que les salaires français. (ref diagramme précédent)
+
+### Distribution des salaires en fonction de la région
+
+```{r distributionRegion}
+# Remove rows with non-finite values in Salaire_annuel
+raw_data <- raw_data[!is.na(raw_data$Salaire_annuel) & is.finite(raw_data$Salaire_annuel), ]
+
+# Remove rows with non-finite values in other numeric columns if needed
+# raw_data <- raw_data[complete.cases(raw_data[, numeric_cols]), ]
+
+
+ordered_regions <- names(sort(tapply(raw_data$Salaire_annuel, raw_data$Region, median)))
+
+
+# Plotting the distribution of salaries based on region
+ggplot(raw_data, aes(x = Region, y = Salaire_annuel)) +
+  geom_boxplot() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  scale_x_discrete(limits = ordered_regions)+
+  labs(title = "Distribution des salaires en fonction de la région",
+       x = "Région",
+       y = "Salaire Annuel")
+
+```
+
+Le minimum étant pour la Corse avec 30 000€/an tandis-que l'ile-de-France est plus proche des 40 000€ à 45 000€, il y a un lien mais aucune région ne semble se distringuer particulièrement.
+
+
+
+### Distribution des salaires en fonction du secteur d'activité
+
+```{r secteurdactivite}
+# Order the regions based on the median salary
+ordered_departments <- names(sort(tapply(raw_data$Salaire_annuel, raw_data$Departement, median)))
+
+# Select the top 10 departments
+top_10_departments <- head(ordered_departments, 10)
+
+# Plotting the distribution of salaries based on region with ordered x-axis
+ggplot(raw_data, aes(x = reorder(Departement, Salaire_annuel, FUN = median), y = Salaire_annuel)) +
+  geom_boxplot() +
+  labs(title = "Distribution des salaires en fonction du département",
+       x = "Région",
+       y = "Salaire Annuel") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  scale_x_discrete(limits = top_10_departments)
+
+
+```
+
+Aucun département ne semble avoir suffisament de données pour être significatif. 
+
+
+
+
+# Etude données 2019
+
+## Récupération des données
+
+```{r chargementData}
+# Trying ISO-8859-1
+raw_data <- read.csv("data/data_2019.csv", sep = ";", fileEncoding = "UTF-8")
+```
+
+
+Définir toutes les données comme caractère (variable qualitative) sauf le salaire
+
+```{r colonnesQualitative}
+# Lists specifying which columns to convert to factors and numeric
+factor_cols <- c("Date", "identifiant", "Genre", "Annee_diplome","Type_formation","Filiere","Situation","Secteur","Nature_contrat", "France","Region", "Pays", "Taille_entreprise", "Nom_entreprise", "Departement", "Intitule_poste", "Secteur_activite")
+numeric_cols <- c("Anciennete", "Salaire_annuel", "Responsabilite_hierarchique", "Responsabilite_budget", "Responsabilite_equipe", "Responsabilite_projet", "Satisfaction_globale", "Saitisfaction_relations", "Satisfaction_salaire", "Satisfaction_autonomie", "Satisfaction_localisation")
+
+# Convert columns to factors
+raw_data[factor_cols] <- lapply(raw_data[factor_cols], as.factor)
+
+# Convert columns to numeric
+raw_data[numeric_cols] <- lapply(raw_data[numeric_cols], as.numeric)
+```
+
+```{r affichageSummaryRawData, echo=FALSE, eval=FALSE}
+summary(raw_data)
+```
+
+Avec ces valeurs on peut déduire beaucoup de choses... 
+
+
+## Première étude 
+
+### Disparité homme/femme - toute formation confondue
+```{r etude1}
+boxplot(raw_data$Salaire_annuel ~ raw_data$Genre)
+```
+
+En 2019, on ne remarque pas de différence significative entre les hommes et les femmes.
+
+
+
+
+### Disparité sur les dates d'optention du diplôme
+
+```{r etude2}
+boxplot(raw_data$Salaire_annuel ~ raw_data$Annee_diplome)
+```
+
+L'année d'optention dans ces données n'ont pas l'air d'avoir un grand impact sur les salaires.
+
+
+
+
+### Disparité formation initiale/apprentissage/contrat de professionalisation
+```{r etude3}
+boxplot(raw_data$Salaire_annuel ~ raw_data$Type_formation)
+```
+
+Les apprentis et les élèves en formation initiale semblent avoir des salaire similaires. Tandis que ceux en contrat de professionnalisation ont des salaires en moyenne similaire avec une plus grande disparité haute.
+
+
+
+
+### Disparité des filières
+
+```{r etude4}
+boxplot(raw_data$Salaire_annuel ~ raw_data$Filiere)
+```
+
+En 2019, les salaires se basent principalement entre 30 000 et 40 000€ sans grosses variations.
+
+
+
+### Filtrage des personnes en activité 
+```{r filtrage_activite}
+filtered_data <- remove_rows_by_value(raw_data, "Situation", "En recherche emploi")
+filtered_data <- remove_rows_by_value(filtered_data, "Situation", "En poursuite d'études (hors thèse) / en formation")
+filtered_data <- remove_rows_by_value(filtered_data, "Situation", "These")
+filtered_data <- remove_rows_by_value(filtered_data, "Situation", "Sans activité") 
+filtered_data <- remove_rows_by_value(filtered_data, "Situation", "Volontariat")
+filtered_data <- remove_rows_by_value(filtered_data, "Situation", "En création d'entreprise /reprise d'entreprise")
+filtered_data <- remove_rows_by_value(filtered_data, "Situation", "Etudes")
+
+activite_data <- filtered_data
+```
+
+
+
+### Disparité par nature du contrat
+```{r etude7, warning=FALSE}
+
+
+# Filtrage de certains contrat peu représentatif
+filtered_data <- remove_rows_by_value(activite_data, "Nature_contrat", "Service à la personne (cours particulier de mathématiques via Acadomia)")
+filtered_data <- remove_rows_by_value(filtered_data, "Nature_contrat", "")
+
+ggplot(filtered_data, aes(x = Nature_contrat, y = Salaire_annuel)) +
+  geom_boxplot() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 8)) +
+  labs(title = "Salary Distribution by Contract Type", x = "Contract Type", y = "Salary")
+
+```
+
+On peut remarquer que les cdi et contrats locaux ont un net avantages par rapport aux CDD et CTT.
+
+
+
+### Distribution du salaire en fonction de l'ancienneté 
+
+```{r etude8}
+
+
+
+ordered_data <- raw_data[order(as.numeric(raw_data$Anciennete)), ]
+
+boxplot(raw_data$Salaire_annuel ~ as.numeric(raw_data$Anciennete), data = ordered_data)
+```
+
+Il ne semble à priori pas avoir de lien entre l'ancienneté et le salaire sur les deux premières années, après cela, il manque des informations.
+
+
+
+### Distribution du salaire en fonction de l'ancienneté (Groupée)
+```{r etude9}
+monthGroup <- cut(as.numeric(raw_data$Anciennete),
+                               breaks = c(0, 6, 12, 24, Inf),
+                               labels = c("1-6", "7-12", "13-24", "25+"),
+                               right = FALSE)
+
+
+boxplot(raw_data$Salaire_annuel ~ monthGroup, data = raw_data)
+```
+
+En regroupant l'ancienneté sur des périodes de 6 mois, on ne remarque aucun changement significatif.
+
+
+### Distribution du salaire en fonction de France/étranger
+```{r etude10}
+boxplot(raw_data$Salaire_annuel ~ raw_data$France)
+```
+
+Ici la France à tendance à être moins bien payé que l'étranger ainsi que l'étranger ayant une plus grande dispertion de salaires contraitement à l'étranger où les salaires sont plus rassemblés.
+
+
+
+
+### Distribution du salaire en fonction du pays à l'étranger
+```{r etude11, warning=FALSE}
+raw_data_filtered <- raw_data[complete.cases(raw_data$Pays) & raw_data$Pays != "" & !grepl("^\\s*$", raw_data$Pays) & !is.na(raw_data$Salaire_annuel), ]
+
+
+median_salaries <- tapply(raw_data_filtered$Salaire_annuel, raw_data_filtered$Pays, median)
+median_order <- names(sort(median_salaries))
+
+emploiFactor <- factor(raw_data_filtered$Pays, levels = median_order)
+
+
+
+ggplot(raw_data_filtered, aes(x = emploiFactor, y = Salaire_annuel)) +
+  geom_boxplot(na.rm = TRUE) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 8)) +
+  labs(title = "Salary Distribution by Country", x = "Country", y = "Salary")
+```
+
+
+Ici les données sont trop faible pour de réelles interprétations, sauf pour l'Irlande, le Royaume-Uni, Canada et Suisse où les salaires. Le Royaume-Uni semblant être proche de la France, cependant l'Irlande, Canada et Suisse ayant un salaire nêtement plus grand.
+
+
+<<<<<<< Updated upstream
+### Distribution des salaires en fonction de la région
+
+```{r distributionRegion}
+# Remove rows with non-finite values in Salaire_annuel
+raw_data <- raw_data[!is.na(raw_data$Salaire_annuel) & is.finite(raw_data$Salaire_annuel), ]
+
+# Remove rows with non-finite values in other numeric columns if needed
+# raw_data <- raw_data[complete.cases(raw_data[, numeric_cols]), ]
+
+
+ordered_regions <- names(sort(tapply(raw_data$Salaire_annuel, raw_data$Region, median)))
+
+
+# Plotting the distribution of salaries based on region
+ggplot(raw_data, aes(x = Region, y = Salaire_annuel)) +
+  geom_boxplot() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  scale_x_discrete(limits = ordered_regions)+
+  labs(title = "Distribution des salaires en fonction de la région",
+       x = "Région",
+       y = "Salaire Annuel")
+
+```
+
+Le minimum étant pour la Corse avec 30 000€/an tandis-que l'ile-de-France est plus proche des 40 000€ à 45 000€, il y a un lien mais aucune région ne semble se distringuer particulièrement.
+
+
+
+#Etude données 2020
+
+##Récupération des données
+
+```{r chargementData1, echo=TRUE}
+# Trying ISO-8859-1
+raw_data <- read.csv("data/data_2020.csv", sep = ";")
+```
+
+Définir toutes les données comme caractère (variable qualitative) sauf le salaire
+
+```{r colonnesQualitative1}
+# Lists specifying which columns to convert to factors and numeric
+factor_cols <- c("Date", "identifiant", "Genre", "Annee_diplome","Type_formation","Filiere","Situation","Secteur","Nature_contrat", "France","Region", "Pays", "Taille_entreprise", "Nom_entreprise", "Departement", "Intitule_poste", "Secteur_activite")
+numeric_cols <- c("Anciennete", "Salaire_annuel", "Responsabilite_hierarchique", "Responsabilite_budget", "Responsabilite_equipe", "Responsabilite_projet", "Satisfaction_globale", "Saitisfaction_relations", "Satisfaction_salaire", "Satisfaction_autonomie", "Satisfaction_localisation")
+
+# Convert columns to factors
+raw_data[factor_cols] <- lapply(raw_data[factor_cols], as.factor)
+
+# Convert columns to numeric
+raw_data[numeric_cols] <- lapply(raw_data[numeric_cols], as.numeric)
+```
+
+```{r affichageSummaryRawData1, echo=FALSE, eval=FALSE}
+summary(raw_data)
+```
+
+Avec ces valeurs on peut déduire beaucoup de choses...
+
+##Fonction de filtre
+
+Ceci est une fonction utilisé après pour retirer différentes lignes en fonction des valeurs dans une certain colonne. (équivalent d'un select where)
+
+```{r fonctionFiltre1}
+remove_rows_by_value <- function(data, column_name, value_to_remove) {
+  data_filtered <- subset(data, !(data[[column_name]] == value_to_remove))
+  return(data_filtered)
+}
+```
+
+##Première étude
+
+###Disparité homme/femme - toute formation confondue
+
+```{r etude1}
+boxplot(raw_data$Salaire_annuel ~ raw_data$Genre)
+```
+
+En 2020, on constate que les hommes, peu importe leur filière, ont un bien meilleur salaire que les femmes diplomées de Polytech.
+
+###Disparité sur les dates d'optention du diplôme
+
+```{r etude2}
+boxplot(raw_data$Salaire_annuel ~ raw_data$Annee_diplome)
+```
+
+On peut voir que les salaire des diplomés en 2017 et 2018 sont assez équivalents. En 2019 cependant, il y a une baisse par rapport aux années précédentes. Cela peut s'expliquer par le fait que les débutants ont un salaire plus bas que les salariés de longue date.
+
+###Disparité formation initiale/apprentissage/contrat de professionalisation
+
+```{r etude3}
+boxplot(raw_data$Salaire_annuel ~ raw_data$Type_formation)
+```
+
+En moyenne, les apprentis et les élèves en professionnalisation semble avoir de meilleurs salaires que les étudiants en formation initiale. Par contre, il y a beaucoup de disparités parmi les salaires de ces derniers.
+
+###Disparité des filières
+
+```{r etude4}
+boxplot(raw_data$Salaire_annuel ~ raw_data$Filiere)
+```
+
+La filière ayant les meilleurs salaires est la filière MSI. Puis viennent les SE, puis les IG et les MI. La filière la moins bien rémunérée en 2020 est STE.
+
+###Filtrage des personnes en activité
+
+```{r filtrage_activite1}
+filtered_data <- remove_rows_by_value(raw_data, "Situation", "En recherche emploi")
+filtered_data <- remove_rows_by_value(filtered_data, "Situation", "En poursuite d'études (hors thèse) / en formation")
+filtered_data <- remove_rows_by_value(filtered_data, "Situation", "These")
+filtered_data <- remove_rows_by_value(filtered_data, "Situation", "Sans activité") 
+filtered_data <- remove_rows_by_value(filtered_data, "Situation", "Volontariat")
+filtered_data <- remove_rows_by_value(filtered_data, "Situation", "En création d'entreprise /reprise d'entreprise")
+filtered_data <- remove_rows_by_value(filtered_data, "Situation", "Etudes")
+
+activite_data <- filtered_data
+```
+
+###Disparité par nature du contrat
+
+```{r etude7, warning=FALSE}
+# Filtrage de certains contrat peu représentatif
+filtered_data <- remove_rows_by_value(activite_data, "Nature_contrat", "Service à la personne (cours particulier de mathématiques via Acadomia)")
+filtered_data <- remove_rows_by_value(filtered_data, "Nature_contrat", "")
+
+ggplot(filtered_data, aes(x = Nature_contrat, y = Salaire_annuel)) +
+  geom_boxplot() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 8)) +
+  labs(title = "Salary Distribution by Contract Type", x = "Contract Type", y = "Salary")
+```
+
+
+On peut noter que les personnes en CDI ont un avantage conséquent par rapport aux CDD. Les quelques contrats locaux ont cependant un salaire encore meilleur.
+
+###Distribution du salaire en fonction de l'ancienneté
+
+```{r etude8}
+
+ordered_data <- raw_data[order(as.numeric(raw_data$Anciennete)), ]
+
+boxplot(raw_data$Salaire_annuel ~ as.numeric(raw_data$Anciennete), data = ordered_data)
+```
+
+Il ne semble pas avoir de corrélation entre l'ancienneté et le salaire. Il ne semble pas y avoir de tendance a augmenter ou à baisser suivant l'ancienneté.
+
+###Distribution du salaire en fonction de l'ancienneté (Groupée)
+
+```{r etude9}
+monthGroup <- cut(as.numeric(raw_data$Anciennete),
+                               breaks = c(0, 6, 12, 24, Inf),
+                               labels = c("1-6", "7-12", "13-24", "25+"),
+                               right = FALSE)
+
+
+boxplot(raw_data$Salaire_annuel ~ monthGroup, data = raw_data)
+```
+
+En regroupant l'ancienneté sur des périodes de 6 mois, on remarque une augmentation progressive à partir de 7 mois, mais elle n'est pas conséquente.
+
+###Distribution du salaire en fonction de France/étranger
+
+```{r etude10}
+boxplot(raw_data$Salaire_annuel ~ raw_data$France)
+```
+
+Les étudiants partis travailler à l'étranger semblent avoir de meilleurs salaires mais il y a une grande disparité pour les salaires étrangers.
+
+###Distribution du salaire en fonction du pays à l'étranger
+
+```{r etude11, warning=FALSE}
+raw_data_filtered <- raw_data[complete.cases(raw_data$Pays) & raw_data$Pays != "" & !grepl("^\\s*$", raw_data$Pays) & !is.na(raw_data$Salaire_annuel), ]
+
+
+median_salaries <- tapply(raw_data_filtered$Salaire_annuel, raw_data_filtered$Pays, median)
+median_order <- names(sort(median_salaries))
+
+emploiFactor <- factor(raw_data_filtered$Pays, levels = median_order)
+
+
+
+ggplot(raw_data_filtered, aes(x = emploiFactor, y = Salaire_annuel)) +
+  geom_boxplot(na.rm = TRUE) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 8)) +
+  labs(title = "Salary Distribution by Country", x = "Country", y = "Salary")
+```
+
+Il n'y a pas assez de données pour faire des études plus importantes, on constate que c'est en Suisse que les diplomés de Polytech ont les meilleurs salaires contrairement à la Thaïlande.
+
+# Etude données 2021
+
+## Récupération des données
+
+```{r chargementData}
+# Trying ISO-8859-1
+raw_data <- read.csv("data/data_2021.csv", sep = ",")
+```
+
+
+Définir toutes les données comme caractère (variable qualitative) sauf le salaire
+
+```{r colonnesQualitative}
+# Lists specifying which columns to convert to factors and numeric
+factor_cols <- c("Date", "Identifiant", "Genre", "Annee_diplome","Type_formation","Filiere","Situation","Secteur","Nature_contrat", "France","Region", "Pays", "Taille_entreprise", "Nom_entreprise", "Departement", "Intitule_poste")
+numeric_cols <- c("Anciennete", "Salaire_annuel")
+
+# Convert columns to factors
+raw_data[factor_cols] <- lapply(raw_data[factor_cols], as.factor)
+
+# Convert columns to numeric
+raw_data[numeric_cols] <- lapply(raw_data[numeric_cols], as.numeric)
+```
+
+```{r affichageSummaryRawData, eval=FALSE}
+summary(raw_data)
+```
+
+Avec ces valeurs on peut déduire beaucoup de choses... 
+
+### Fonction de filtre 
+Ceci est une fonction utilisé après pour retirer différentes lignes en fonction des valeurs dans une certain colonne. (équivalent d'un select where)
+```{r fonctionFiltre}
+remove_rows_by_value <- function(data, column_name, value_to_remove) {
+  data_filtered <- subset(data, !(data[[column_name]] == value_to_remove))
+  return(data_filtered)
+}
+```
+
+## Première étude 
+
+### Disparité homme/femme - toute formation confondue
+```{r etude1}
+boxplot(raw_data$Salaire_annuel ~ raw_data$Genre)
+```
+
+En 2021, on peut remarquer que les hommes sont lég_rement mieux payés que les femmes.Les meilleurs salaires sont pour des hommes.
+
+
+
+
+### Disparité sur les dates d'optention du diplôme
+
+```{r etude2}
+boxplot(raw_data$Salaire_annuel ~ raw_data$Annee_diplome)
+```
+
+Plus l'année d'optention du diplôme est ancienne, il semblerait que plus le salaire est élevé, ce qui s'explique par l'ancienneté et l'expérience.
+
+
+
+
+### Disparité formation initiale/apprentissage/contrat de professionalisation
+```{r etude3}
+boxplot(raw_data$Salaire_annuel ~ raw_data$Type_formation)
+```
+
+Les élèves ayant fait leur dernière année en professionnalisation ont à peu près les mêmes salaires que les étudiants suivant la formation initiale. Les apprentis ont un salaire légèrement plus avantageux.
+
+
+
+
+### Disparité des filières
+
+```{r etude4}
+boxplot(raw_data$Salaire_annuel ~ raw_data$Filiere)
+```
+
+
+### Filtrage des personnes en activité 
+```{r filtrage_activite}
+filtered_data <- remove_rows_by_value(raw_data, "Situation", "En recherche emploi")
+filtered_data <- remove_rows_by_value(filtered_data, "Situation", "En poursuite d'études (hors thèse) / en formation")
+filtered_data <- remove_rows_by_value(filtered_data, "Situation", "These")
+filtered_data <- remove_rows_by_value(filtered_data, "Situation", "Sans activité") 
+filtered_data <- remove_rows_by_value(filtered_data, "Situation", "Volontariat")
+filtered_data <- remove_rows_by_value(filtered_data, "Situation", "En création d'entreprise /reprise d'entreprise")
+filtered_data <- remove_rows_by_value(filtered_data, "Situation", "Etudes")
+
+activite_data <- filtered_data
+```
+
+En 2022, ce sont les étudiants de la filière MSI qui ont les meilleurs salaires, suivis par les IG. Les filières les moins rémunérées sont : STE, GBA et MEA.
+
+
+### Disparité par nature du contrat
+```{r etude7, warning=FALSE}
+
+
+# Filtrage de certains contrat peu représentatif
+filtered_data <- remove_rows_by_value(activite_data, "Nature_contrat", "Service à la personne (cours particulier de mathématiques via Acadomia)")
+filtered_data <- remove_rows_by_value(filtered_data, "Nature_contrat", "")
+
+ggplot(filtered_data, aes(x = Nature_contrat, y = Salaire_annuel)) +
+  geom_boxplot() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 8)) +
+  labs(title = "Salary Distribution by Contract Type", x = "Contract Type", y = "Salary")
+
+```
+
+En 2021, on peut observer que les salariés ayant un CDI ont un salaire nettement meilleur que les CDD.
+
+
+
+### Distribution du salaire en fonction de l'ancienneté 
+
+```{r etude8}
+
+
+
+ordered_data <- raw_data[order(as.numeric(raw_data$Anciennete)), ]
+
+boxplot(raw_data$Salaire_annuel ~ as.numeric(raw_data$Anciennete), data = ordered_data)
+```
+
+Il ne semble à priori pas avoir de lien entre l'ancienneté et le salaire sur les deux premières années, il n'y a pas de mouvement net d'augmentation.
+
+
+
+### Distribution du salaire en fonction de l'ancienneté (Groupée)
+```{r etude9}
+monthGroup <- cut(as.numeric(raw_data$Anciennete),
+                               breaks = c(0, 6, 12, 24, Inf),
+                               labels = c("1-6", "7-12", "13-24", "25+"),
+                               right = FALSE)
+
+
+boxplot(raw_data$Salaire_annuel ~ monthGroup, data = raw_data)
+```
+
+En regroupant l'ancienneté sur des périodes de 6 mois, on remarque une légère augmentation à partir de 7 mois, mais ce n'est pas significatif pour autant.
+
+
+### Distribution du salaire en fonction de France/étranger
+```{r etude10}
+boxplot(raw_data$Salaire_annuel ~ raw_data$France)
+```
+
+En moyenne, les diplomés de Polytech sont mieux rémunérés quand ils travaillent à l'étranger mais la disarité de leurs salaires est assez notable.
+
+
+
+### Distribution du salaire en fonction du pays à l'étranger
+```{r etude11, warning=FALSE}
+raw_data_filtered <- raw_data[complete.cases(raw_data$Pays) & raw_data$Pays != "" & !grepl("^\\s*$", raw_data$Pays) & !is.na(raw_data$Salaire_annuel), ]
+
+
+median_salaries <- tapply(raw_data_filtered$Salaire_annuel, raw_data_filtered$Pays, median)
+median_order <- names(sort(median_salaries))
+
+emploiFactor <- factor(raw_data_filtered$Pays, levels = median_order)
+
+
+
+ggplot(raw_data_filtered, aes(x = emploiFactor, y = Salaire_annuel)) +
+  geom_boxplot(na.rm = TRUE) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 8)) +
+  labs(title = "Salary Distribution by Country", x = "Country", y = "Salary")
+```
+
+
+Ici les données sont trop faible pour de réelles interprétations. On peut noter que le meilleur salaire est en Arabie Saoudite. La Suisse et le Royaume-Unis semblent également concentrer les salaires les plus intéressants.
+
+### Distribution des salaires en fonction de la région
+
+```{r distributionRegion}
+# Remove rows with non-finite values in Salaire_annuel
+raw_data <- raw_data[!is.na(raw_data$Salaire_annuel) & is.finite(raw_data$Salaire_annuel), ]
+
+# Remove rows with non-finite values in other numeric columns if needed
+# raw_data <- raw_data[complete.cases(raw_data[, numeric_cols]), ]
+
+
+ordered_regions <- names(sort(tapply(raw_data$Salaire_annuel, raw_data$Region, median)))
+
+
+# Plotting the distribution of salaries based on region
+ggplot(raw_data, aes(x = Region, y = Salaire_annuel)) +
+  geom_boxplot() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  scale_x_discrete(limits = ordered_regions)+
+  labs(title = "Distribution des salaires en fonction de la région",
+       x = "Région",
+       y = "Salaire Annuel")
+
+```
+
+On peut distinguer la Réunion commme étant la région ou les diplomés de Polytech sont les moins payés de France, à l'inverse de la Guadeloupe. Il y a une différence d'à peu près 20000 par an entre ces deux régions.
+
+
+
+### Distribution des salaires en fonction du secteur d'activité
+
+```{r secteurdactivite}
+# Order the regions based on the median salary
+ordered_departments <- names(sort(tapply(raw_data$Salaire_annuel, raw_data$Departement, median)))
+
+# Select the top 10 departments
+top_10_departments <- head(ordered_departments, 10)
+
+# Plotting the distribution of salaries based on region with ordered x-axis
+ggplot(raw_data, aes(x = reorder(Departement, Salaire_annuel, FUN = median), y = Salaire_annuel)) +
+  geom_boxplot() +
+  labs(title = "Distribution des salaires en fonction du département",
+       x = "Région",
+       y = "Salaire Annuel") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  scale_x_discrete(limits = top_10_departments)
+
+
+```
+
+Par manque de données, aucun secteur ne semble se départager. 
+
+
+=======
+
+# Etude données 2022
+
+## Récupération des données
+
+```{r chargementData}
+# Trying ISO-8859-1
+raw_data <- read.csv("data/data_2022.csv", sep = ",", fileEncoding = "UTF-8")
+```
+
+
+Définir toutes les données comme caractère (variable qualitative) sauf le salaire
+
+```{r colonnesQualitative}
+# Lists specifying which columns to convert to factors and numeric
+factor_cols <- c("Date", "Identifiant", "Genre", "Annee_diplome","Type_formation","Filiere","Situation_actuelle","Secteur","Nature_contrat", "Pays","Region", "Pays_etranger", "Taille_entreprise", "Nom_entreprise", "Departement", "Intitule_poste", "Secteur_activite")
+numeric_cols <- c("Anciennete","Salaire_annuel_brut", "Salaire_annuel_brut_primes", "Responsabilite_hierarchique", "Responsabilite_budget", "Responsabilite_equipe", "Responsabilite_projet", "Satisfaction_globale", "Saitisfaction_relations", "Satisfaction_salaire","Satisfaction_condition_travail", "Satisfaction_autonomie", "Satisfaction_localisation")
+
+# Convert columns to factors
+raw_data[factor_cols] <- lapply(raw_data[factor_cols], as.factor)
+
+# Convert columns to numeric
+raw_data[numeric_cols] <- lapply(raw_data[numeric_cols], as.numeric)
+```
+
+```{r affichageSummaryRawData, echo=FALSE, eval=FALSE}
+summary(raw_data)
+```
+
+Avec ces valeurs on peut déduire beaucoup de choses... 
+
+### Fonction de filtre 
+Ceci est une fonction utilisé après pour retirer différentes lignes en fonction des valeurs dans une certain colonne. (équivalent d'un select where)
+```{r fonctionFiltre}
+remove_rows_by_value <- function(data, column_name, value_to_remove) {
+  data_filtered <- subset(data, !(data[[column_name]] == value_to_remove))
+  return(data_filtered)
+}
+```
+
+## Première étude 
+
+### Disparité homme/femme - toute formation confondue
+```{r etude1}
+boxplot(raw_data$Salaire_annuel_brut_primes ~ raw_data$Genre)
+```
+
+En 2019, on ne remarque pas de différence significative entre les hommes et les femmes.
+
+
+
+
+### Disparité sur les dates d'optention du diplôme
+
+```{r etude2}
+boxplot(raw_data$Salaire_annuel_brut_primes~ raw_data$Annee_diplome)
+```
+
+L'année d'optention dans ces données n'ont pas l'air d'avoir un grand impact sur les salaires.
+
+
+
+
+### Disparité formation initiale/apprentissage/contrat de professionalisation
+```{r etude3}
+boxplot(raw_data$Salaire_annuel_brut_primes ~ raw_data$Type_formation)
+```
+
+Les apprentis et les élèves en formation initiale semblent avoir des salaire similaires. Tandis que ceux en contrat de professionnalisation ont des salaires en moyenne similaire avec une plus grande disparité haute.
+
+
+
+
+### Disparité des filières
+
+```{r etude4}
+boxplot(raw_data$Salaire_annuel_brut_primes ~ raw_data$Filiere)
+```
+
+En 2019, les salaires se basent principalement entre 30 000 et 40 000€ sans grosses variations.
+
+
+
+### Filtrage des personnes en activité 
+```{r filtrage_activite}
+filtered_data <- remove_rows_by_value(raw_data, "Situation", "En recherche emploi")
+filtered_data <- remove_rows_by_value(filtered_data, "Situation", "En poursuite d'études (hors thèse) / en formation")
+filtered_data <- remove_rows_by_value(filtered_data, "Situation", "These")
+filtered_data <- remove_rows_by_value(filtered_data, "Situation", "Sans activité") 
+filtered_data <- remove_rows_by_value(filtered_data, "Situation", "Volontariat")
+filtered_data <- remove_rows_by_value(filtered_data, "Situation", "En création d'entreprise /reprise d'entreprise")
+filtered_data <- remove_rows_by_value(filtered_data, "Situation", "Etudes")
+
+activite_data <- filtered_data
+```
+
+
+
+### Disparité par nature du contrat
+```{r etude7, warning=FALSE}
+
+
+# Filtrage de certains contrat peu représentatif
+filtered_data <- remove_rows_by_value(activite_data, "Nature_contrat", "Service à la personne (cours particulier de mathématiques via Acadomia)")
+filtered_data <- remove_rows_by_value(filtered_data, "Nature_contrat", "")
+
+ggplot(filtered_data, aes(x = Nature_contrat, y = Salaire_annuel_brut_primes)) +
+  geom_boxplot() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 8)) +
+  labs(title = "Salary Distribution by Contract Type", x = "Contract Type", y = "Salary")
+
+```
+
+On peut remarquer que les cdi et contrats locaux ont un net avantages par rapport aux CDD et CTT.
+
+
+
+### Distribution du salaire en fonction de l'ancienneté 
+
+```{r etude8}
+
+
+
+ordered_data <- raw_data[order(as.numeric(raw_data$Anciennete)), ]
+
+boxplot(raw_data$Salaire_annuel_brut_primes ~ as.numeric(raw_data$Anciennete), data = ordered_data)
+```
+
+Il ne semble à priori pas avoir de lien entre l'ancienneté et le salaire sur les deux premières années, après cela, il manque des informations.
+
+
+
+### Distribution du salaire en fonction de l'ancienneté (Groupée)
+```{r etude9}
+monthGroup <- cut(as.numeric(raw_data$Anciennete),
+                               breaks = c(0, 6, 12, 24, Inf),
+                               labels = c("1-6", "7-12", "13-24", "25+"),
+                               right = FALSE)
+
+
+boxplot(raw_data$Salaire_annuel_brut_primes ~ monthGroup, data = raw_data)
+```
+
+En regroupant l'ancienneté sur des périodes de 6 mois, on ne remarque aucun changement significatif.
+
+
+### Distribution du salaire en fonction de France/étranger
+```{r etude10}
+boxplot(raw_data$Salaire_annuel_brut_primes ~ raw_data$Pays)
+```
+
+Ici la France à tendance à être moins bien payé que l'étranger ainsi que l'étranger ayant une plus grande dispertion de salaires contraitement à l'étranger où les salaires sont plus rassemblés.
+
+
+
+
+### Distribution du salaire en fonction du pays à l'étranger
+```{r etude11, warning=FALSE}
+raw_data_filtered <- raw_data[complete.cases(raw_data$Pays) & raw_data$Pays != "" & !grepl("^\\s*$", raw_data$Pays) & !is.na(raw_data$Salaire_annuel), ]
+
+
+median_salaries <- tapply(raw_data_filtered$Salaire_annuel_brut_primes, raw_data_filtered$Pays, median)
+median_order <- names(sort(median_salaries))
+
+emploiFactor <- factor(raw_data_filtered$Pays, levels = median_order)
+
+
+
+ggplot(raw_data_filtered, aes(x = emploiFactor, y = Salaire_annuel_brut_primes)) +
+  geom_boxplot(na.rm = TRUE) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 8)) +
+  labs(title = "Salary Distribution by Country", x = "Country", y = "Salary")
+```
+
+
+Ici les données sont trop faible pour de réelles interprétations, sauf pour l'Irlande, le Royaume-Uni, Canada et Suisse où les salaires. Le Royaume-Uni semblant être proche de la France, cependant l'Irlande, Canada et Suisse ayant un salaire nêtement plus grand.
+
+
+# Etude données 2023
+
+## Récupération des données
+
+```{r chargementData}
+# Trying ISO-8859-1
+raw_data <- read.csv("data/data_2023.csv", sep = ",", fileEncoding = "UTF-8")
+```
+
+
+Définir toutes les données comme caractère (variable qualitative) sauf le salaire
+
+```{r colonnesQualitative}
+# Lists specifying which columns to convert to factors and numeric
+factor_cols <- c("Date", "Identifiant", "Genre", "Annee_diplome","Type_formation","Filiere","Situation_actuelle","Secteur","Nature_contrat", "Pays","Region", "Pays_etranger", "Taille_entreprise", "Nom_entreprise", "Departement", "Intitule_poste", "Secteur_activite")
+numeric_cols <- c("Anciennete","Salaire_annuel_brut", "Salaire_annuel_brut_primes", "Responsabilite_hierarchique", "Responsabilite_budget", "Responsabilite_equipe", "Responsabilite_projet", "Satisfaction_globale", "Saitisfaction_relations", "Satisfaction_salaire","Satisfaction_condition_travail", "Satisfaction_autonomie", "Satisfaction_localisation")
+
+# Convert columns to factors
+raw_data[factor_cols] <- lapply(raw_data[factor_cols], as.factor)
+
+# Convert columns to numeric
+raw_data[numeric_cols] <- sapply(raw_data[numeric_cols], as.numeric)
+```
+
+```{r affichageSummaryRawData, echo=FALSE, eval=FALSE}
+summary(raw_data)
+```
+
+Avec ces valeurs on peut déduire beaucoup de choses... 
+
+
+
+## Première étude 
+
+### Disparité homme/femme - toute formation confondue
+```{r etude1}
+boxplot(raw_data$Salaire_annuel_brut_primes ~ raw_data$Genre)
+```
+
+En 2019, on ne remarque pas de différence significative entre les hommes et les femmes.
+
+
+
+
+### Disparité sur les dates d'optention du diplôme
+
+```{r etude2}
+boxplot(raw_data$Salaire_annuel_brut_primes~ raw_data$Annee_diplome)
+```
+
+L'année d'optention dans ces données n'ont pas l'air d'avoir un grand impact sur les salaires.
+
+
+
+
+### Disparité formation initiale/apprentissage/contrat de professionalisation
+```{r etude3}
+boxplot(raw_data$Salaire_annuel_brut_primes ~ raw_data$Type_formation)
+```
+
+Les apprentis et les élèves en formation initiale semblent avoir des salaire similaires. Tandis que ceux en contrat de professionnalisation ont des salaires en moyenne similaire avec une plus grande disparité haute.
+
+
+
+
+### Disparité des filières
+
+```{r etude4}
+boxplot(raw_data$Salaire_annuel_brut_primes ~ raw_data$Filiere)
+```
+
+En 2019, les salaires se basent principalement entre 30 000 et 40 000€ sans grosses variations.
+
+
+
+### Filtrage des personnes en activité 
+```{r filtrage_activite}
+filtered_data <- remove_rows_by_value(raw_data, "Situation", "En recherche emploi")
+filtered_data <- remove_rows_by_value(filtered_data, "Situation", "En poursuite d'études (hors thèse) / en formation")
+filtered_data <- remove_rows_by_value(filtered_data, "Situation", "These")
+filtered_data <- remove_rows_by_value(filtered_data, "Situation", "Sans activité") 
+filtered_data <- remove_rows_by_value(filtered_data, "Situation", "Volontariat")
+filtered_data <- remove_rows_by_value(filtered_data, "Situation", "En création d'entreprise /reprise d'entreprise")
+filtered_data <- remove_rows_by_value(filtered_data, "Situation", "Etudes")
+
+activite_data <- filtered_data
+```
+
+
+
+### Disparité par nature du contrat
+```{r etude7, warning=FALSE}
+
+
+# Filtrage de certains contrat peu représentatif
+filtered_data <- remove_rows_by_value(activite_data, "Nature_contrat", "Service à la personne (cours particulier de mathématiques via Acadomia)")
+filtered_data <- remove_rows_by_value(filtered_data, "Nature_contrat", "")
+
+ggplot(filtered_data, aes(x = Nature_contrat, y = Salaire_annuel_brut_primes)) +
+  geom_boxplot() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 8)) +
+  labs(title = "Salary Distribution by Contract Type", x = "Contract Type", y = "Salary")
+
+```
+
+On peut remarquer que les cdi et contrats locaux ont un net avantages par rapport aux CDD et CTT.
+
+
+
+### Distribution du salaire en fonction de l'ancienneté 
+
+```{r etude8}
+
+
+
+ordered_data <- raw_data[order(as.numeric(raw_data$Anciennete)), ]
+
+boxplot(raw_data$Salaire_annuel_brut_primes ~ as.numeric(raw_data$Anciennete), data = ordered_data)
+```
+
+Il ne semble à priori pas avoir de lien entre l'ancienneté et le salaire sur les deux premières années, après cela, il manque des informations.
+
+
+
+### Distribution du salaire en fonction de l'ancienneté (Groupée)
+```{r etude9}
+monthGroup <- cut(as.numeric(raw_data$Anciennete),
+                               breaks = c(0, 6, 12, 24, Inf),
+                               labels = c("1-6", "7-12", "13-24", "25+"),
+                               right = FALSE)
+
+
+boxplot(raw_data$Salaire_annuel_brut_primes ~ monthGroup, data = raw_data)
+```
+
+En regroupant l'ancienneté sur des périodes de 6 mois, on ne remarque aucun changement significatif.
+
+
+### Distribution du salaire en fonction de France/étranger
+```{r etude10}
+boxplot(raw_data$Salaire_annuel_brut_primes ~ raw_data$Pays)
+```
+
+Ici la France à tendance à être moins bien payé que l'étranger ainsi que l'étranger ayant une plus grande dispertion de salaires contraitement à l'étranger où les salaires sont plus rassemblés.
+
+
+###Distribution selon les responsabilités
+```{r etude 1}
+boxplot(raw_data$Salaire_annuel ~ raw_data$Responsabilite_hierarchique)
+
+```
+
+
+
+### Distribution du salaire en fonction du pays à l'étranger
+```{r etude11, warning=FALSE}
+raw_data_filtered <- raw_data[complete.cases(raw_data$Pays) & raw_data$Pays != "" & !grepl("^\\s*$", raw_data$Pays) & !is.na(raw_data$Salaire_annuel), ]
+
+
+median_salaries <- tapply(raw_data_filtered$Salaire_annuel_brut_primes, raw_data_filtered$Pays, median)
+median_order <- names(sort(median_salaries))
+
+emploiFactor <- factor(raw_data_filtered$Pays, levels = median_order)
+
+
+
+ggplot(raw_data_filtered, aes(x = emploiFactor, y = Salaire_annuel_brut_primes)) +
+  geom_boxplot(na.rm = TRUE) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 8)) +
+  labs(title = "Salary Distribution by Country", x = "Country", y = "Salary")
+```
+
+
+Ici les données sont trop faible pour de réelles interprétations, sauf pour l'Irlande, le Royaume-Uni, Canada et Suisse où les salaires. Le Royaume-Uni semblant être proche de la France, cependant l'Irlande, Canada et Suisse ayant un salaire nêtement plus grand.
+
+
+
+# Etudes approfondies 
+
+
+## Analyse des données des différentes années
+
+En se basant sur l'analyse des différentes années et de façon plus globale, voici ce que l'on peut en tirer.
+
+Critères ayant un faible impact ou aucun impact :
+- Genre
+- Année de diplôme
+- Ancienneté
+
+Critère ayant un impact modéré :
+- Type de formation (initiale, apprentissage ou contrat de professionnalisation)
+- Filière
+- Nature du contrat
+
+Critère ayant un fort impact :
+- Pays (Etranger/France ainsi qu'à l'étranger)
+
+
+Les Critères pouvant être sélectionné pour une analyse plus poussée sont :
+- Pays
+- Nature du contrat
+- Filière
+- Type de formation
+- Genre (Certes avec un faible impact général, mais pouvant avoir un meilleur impact s'il y a plus de nuances.)
+
+
+## Analyse plus pousées sur les critères ayant un plus fort impact
+
+
+Vu que l'on a récupérer des données redondantes entre les années, le choix de l'année devrait avoir un vaible impact sur les analyses approfondies.
+
+### Chargement des données
+
+```{r chargementData}
+# Trying ISO-8859-1
+base_data <- read.csv("data/data_2023.csv", sep = ",", fileEncoding = "UTF-8")
+
+# Lists specifying which columns to convert to factors and numeric
+factor_cols <- c("Date", "Identifiant", "Genre", "Annee_diplome","Type_formation","Filiere","Situation_actuelle","Secteur","Nature_contrat", "Pays","Region", "Pays_etranger", "Taille_entreprise", "Nom_entreprise", "Departement", "Intitule_poste", "Secteur_activite")
+numeric_cols <- c("Anciennete","Salaire_annuel_brut_primes")
+
+# Convert columns to factors
+base_data[factor_cols] <- lapply(base_data[factor_cols], as.factor)
+
+# Convert columns to numeric
+base_data[numeric_cols] <- lapply(base_data[numeric_cols], as.numeric)
+```
+
+### AFC
+
+
+```{r AFC}
+raw_data <- base_data
+
+# Charger la bibliothèque CA
+library(ca)
+
+# Convertir les variables en facteurs si elles ne le sont pas déjà
+raw_data$Pays <- as.factor(raw_data$Pays)
+raw_data$Nature_contrat <- as.factor(raw_data$Nature_contrat)
+raw_data$Filiere <- as.factor(raw_data$Filiere)
+raw_data$Type_formation <- as.factor(raw_data$Type_formation)
+raw_data$Genre <- as.factor(raw_data$Genre)
+
+# Sélectionner les variables pour l'AFCM
+variables_afcm <- c("Pays", "Nature_contrat", "Filiere", "Type_formation", "Genre")
+
+# Sous-ensemble des données avec les variables sélectionnées
+afcm_data <- raw_data[variables_afcm]
+
+# Supprimer les lignes avec des valeurs manquantes si nécessaire
+afcm_data <- na.omit(afcm_data)
+
+contingency_table <- table(afcm_data)
+
+# Réaliser l'AFCM avec le package CA
+#afcm_result <- ca(afcm_data)
+
+# Afficher les résultats de l'AFCM
+summary(contingency_table)
+
+
+```
+
+
+### Régression multiple
+
+#### Explication
+
+L'analyse de régression multiple indique que le modèle a une certaine significativité globale, mais la significativité individuelle des variables peut varier. Certains pays, types de contrat, filières et genres semblent avoir une influence significative sur le salaire_annuel, tandis que d'autres variables peuvent ne pas être significatives. 
+
+#### l'analyse
+
+```{r regressionMultiple}
+raw_data <- base_data
+
+filtered_data <- remove_rows_by_value(raw_data, "Situation_actuelle", "En recherche emploi")
+filtered_data <- remove_rows_by_value(filtered_data, "Situation_actuelle", "En poursuite d'études (hors thèse) / en formation")
+filtered_data <- remove_rows_by_value(filtered_data, "Situation_actuelle", "These")
+filtered_data <- remove_rows_by_value(filtered_data, "Situation_actuelle", "Sans activité") 
+filtered_data <- remove_rows_by_value(filtered_data, "Situation_actuelle", "Volontariat")
+filtered_data <- remove_rows_by_value(filtered_data, "Situation_actuelle", "En création d'entreprise /reprise d'entreprise")
+filtered_data <- remove_rows_by_value(filtered_data, "Situation_actuelle", "Etudes")
+
+filtered_data <- remove_rows_by_value(filtered_data, "Nature_contrat", "")
+
+filtered_data <- remove_rows_by_value(filtered_data, "Salaire_annuel_brut_primes", "")
+
+filtered_data <- remove_rows_by_value(filtered_data, "Nature_contrat", "CDD a la cimenterie Lafarge de Saint Pierre La Cour depuis le 1 er mars 2022. Passage en CDI a partir de fevrier 2023")
+
+
+
+raw_data <- filtered_data
+
+# Assuming raw_data is your data frame containing the relevant variables
+
+# Convert categorical variables to factors if not done already
+raw_data$Pays_etranger <- as.factor(raw_data$Pays_etranger)
+
+raw_data$Nature_contrat <- as.factor(raw_data$Nature_contrat)
+raw_data$Filiere <- as.factor(raw_data$Filiere)
+raw_data$Type_formation <- as.factor(raw_data$Type_formation)
+raw_data$Genre <- as.factor(raw_data$Genre)
+
+
+# Convert Pays column to character
+raw_data$Pays_etranger <- as.character(raw_data$Pays_etranger)
+raw_data$Pays_etranger <- ifelse(raw_data$Pays == "France", "France", raw_data$Pays_etranger)
+
+# Create a linear model
+reg_model <- lm(Salaire_annuel_brut_primes ~ Filiere + Pays_etranger + Nature_contrat + Type_formation + Genre, data = raw_data)
+
+# Summary of the regression model
+summary(reg_model)
+
+```
+
+
+
+La sortie de la régression multiple fournit plusieurs informations importantes pour interpréter le modèle. Voici une interprétation détaillée :
+
+#### Résumé Global du Modèle
+- Call: La formule utilisée pour ajuster le modèle.
+- Residuals: Statistiques des résidus, y compris le minimum, les quartiles et le maximum.
+
+#### Coefficients du Modèle
+Chaque coefficient représente l'effet de la variable correspondante sur le salaire annuel, toutes les autres variables étant maintenues constantes.
+
+- Estimate: La valeur estimée du coefficient.
+- Std. Error: L'écart type estimé du coefficient.
+- t value: La statistique de test (t-value) pour tester si le coefficient est significativement différent de zéro.
+- Pr(>|t|): La valeur p associée à la statistique de test, indiquant la significativité du coefficient.
+
+#### Intercept
+Intercept (1 not defined because of singularities): La constante (l'effet lorsque toutes les variables explicatives sont nulles). Cependant, elle peut ne pas être bien définie en raison de singularités dans les données.
+
+
+#### Interprétation des données
+
+Ici dans les données on peut remarquer que le pays à généralement un impact significatif (en se référant aux étoiles) ainsi que le type de contrat, en revanche la filère, le type de formation et le genre n'ont pas d'impact significatif
+
+
+
+#### Conclusion
+
+Pour conclure, les filières ne semblent pas avoir un impact signicatif comme on pourrait le penser à priori, le type de contrat et le pays où travailler ont cependant un impact significatif
