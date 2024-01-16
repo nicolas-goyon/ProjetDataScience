@@ -7,6 +7,16 @@ output:
 
 # Commun
 
+#Introduction 
+
+**Introduction**
+
+Notre projet de data science se penche attentivement sur l'insertion professionnelle des ingénieurs diplômés de Polytech Montpellier, en mettant l'accent sur l'évolution des salaires à 6, 18 et 30 mois après la fin des études. Au fil d'une étude, l'école a compilé des données variées, fournissant une toile de fond essentielle pour comprendre les tenants et aboutissants post-diplôme.
+
+Notre objectif central est de répondre à une question pratique : quels sont les paramètres qui impactent le salaire des diplômés à la sortie des études ? Pour cela, nous analyserons plusieurs variables telles que les filières d'études, les pays d'exercice professionnel, l'année d'obtention du diplôme, la localisation en France, le secteur d'emploi (privé ou public), le type d'entreprises, le genre des diplômés, ainsi que leurs responsabilités professionnelles.
+
+Notre méthodologie consiste à réaliser des études de corrélation année par année, suivies d'une analyse approfondie des paramètres jugés significatifs. L'objectif ultime est de définir avec précision quels sont les facteurs spécifiques qui influent sur le salaire des ingénieurs formés par Polytech Montpellier.
+
 ## Librairies
 
 ```{r libraries}
@@ -60,7 +70,13 @@ remove_rows_by_value <- function(data, column_name, value_to_remove) {
 
 ### Disparité homme/femme - toute formation confondue
 ```{r etude1}
-boxplot(raw_data$Salaire_annuel ~ raw_data$Genre)
+ggplot(raw_data, aes(x = Genre, y = Salaire_annuel, fill = Genre)) +
+  geom_boxplot(width = 0.5, notch = TRUE, outlier.shape = NA) +
+  labs(title = "Différences de salaire par genre",
+       x = "Genre",
+       y = "Salaire Annuel") +
+  theme_minimal() +
+  theme(legend.position = "none")
 ```
 
 En 2018, on ne remarque pas de différence significative entre les hommes et les femmes.
@@ -73,7 +89,12 @@ En 2018, on ne remarque pas de différence significative entre les hommes et les
 ### Disparité sur les dates d'optention du diplôme
 
 ```{r etude2}
-boxplot(raw_data$Salaire_annuel ~ raw_data$Annee_diplome)
+ggplot(raw_data, aes(x = Salaire_annuel, fill = as.factor(Annee_diplome))) +
+  geom_density(alpha = 0.5) +
+  labs(title = "Distribution des salaires par année de diplôme",
+       x = "Salaire Annuel",
+       fill = "Année de Diplôme") +
+  theme_minimal()
 ```
 
 Plus l'année d'optention du diplôme est ancienne, il semblerait que plus le salaire est élevé, ce qui s'explique par l'ancienneté et l'expérience.
@@ -83,7 +104,14 @@ Plus l'année d'optention du diplôme est ancienne, il semblerait que plus le sa
 
 ### Disparité formation initiale/apprentissage/contrat de professionalisation
 ```{r etude3}
-boxplot(raw_data$Salaire_annuel ~ raw_data$Type_formation)
+ggplot(raw_data, aes(x = as.factor(Type_formation), y = Salaire_annuel, fill = as.factor(Type_formation))) +
+  stat_summary(fun = "mean", geom = "col") +
+  labs(title = "Moyenne des salaires par type de formation",
+       x = "Type de Formation",
+       y = "Moyenne du Salaire Annuel",
+       fill = "Type de Formation") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
 ```
 
 Les apprentis et les élèves en formation initiale semblent avoir des salaire similaires. Tandis que ceux en contrat de professionnalisation ont des salaires en moyenne similaire avec une plus grande disparité haute.
@@ -94,7 +122,15 @@ Les apprentis et les élèves en formation initiale semblent avoir des salaire s
 ### Disparité des filières
 
 ```{r etude4}
-boxplot(raw_data$Salaire_annuel ~ raw_data$Filiere)
+ggplot(raw_data, aes(x = Filiere, y = Salaire_annuel, fill = Filiere)) +
+  geom_violin(trim = FALSE, scale = "width", width = 0.8) +
+  geom_boxplot(width = 0.2, fill = "white", color = "black", outlier.shape = NA) +
+  labs(title = "Distribution des salaires par filière",
+       x = "Filière",
+       y = "Salaire Annuel",
+       fill = "Filière") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
 ```
 
 
@@ -116,15 +152,14 @@ activite_data <- filtered_data
 ### Disparité par nature du contrat
 ```{r etude7, warning=FALSE}
 
-
-# Filtrage de certains contrat peu représentatif
-filtered_data <- remove_rows_by_value(activite_data, "Nature_contrat", "Service à la personne (cours particulier de mathématiques via Acadomia)")
-filtered_data <- remove_rows_by_value(filtered_data, "Nature_contrat", "")
-
-ggplot(filtered_data, aes(x = Nature_contrat, y = Salaire_annuel)) +
+# Diagramme en boîte avec couleurs
+ggplot(filtered_data, aes(x = Nature_contrat, y = Salaire_annuel, fill = Nature_contrat)) +
   geom_boxplot() +
+  scale_fill_manual(values = c("#66c2a5", "#fc8d62", "#8da0cb", "#e78ac3", "#a6d854")) +  # Choisissez vos couleurs
+  theme_minimal() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 8)) +
-  labs(title = "Salary Distribution by Contract Type", x = "Contract Type", y = "Salary")
+  labs(title = "Distribution des salaires par type de contrat", x = "Type de Contrat", y = "Salaire Annuel")
+
 
 ```
 
