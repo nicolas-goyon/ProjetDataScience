@@ -1,7 +1,7 @@
 
-#Etude données 2020
+# Etude données 2020
 
-##Récupération des données
+## Récupération des données
 
 ```{r chargementData1, echo=TRUE}
 # Trying ISO-8859-1
@@ -28,7 +28,7 @@ summary(raw_data)
 
 Avec ces valeurs on peut déduire beaucoup de choses...
 
-##Fonction de filtre
+## Fonction de filtre
 
 Ceci est une fonction utilisé après pour retirer différentes lignes en fonction des valeurs dans une certain colonne. (équivalent d'un select where)
 
@@ -39,9 +39,9 @@ remove_rows_by_value <- function(data, column_name, value_to_remove) {
 }
 ```
 
-##Première étude
+## Première étude
 
-###Disparité homme/femme - toute formation confondue
+### Disparité homme/femme - toute formation confondue
 
 ```{r etude1}
 boxplot(raw_data$Salaire_annuel ~ raw_data$Genre)
@@ -49,7 +49,7 @@ boxplot(raw_data$Salaire_annuel ~ raw_data$Genre)
 
 En 2020, on constate que les hommes, peu importe leur filière, ont un bien meilleur salaire que les femmes diplomées de Polytech.
 
-###Disparité sur les dates d'optention du diplôme
+### Disparité sur les dates d'optention du diplôme
 
 ```{r etude2}
 boxplot(raw_data$Salaire_annuel ~ raw_data$Annee_diplome)
@@ -57,7 +57,7 @@ boxplot(raw_data$Salaire_annuel ~ raw_data$Annee_diplome)
 
 On peut voir que les salaire des diplomés en 2017 et 2018 sont assez équivalents. En 2019 cependant, il y a une baisse par rapport aux années précédentes. Cela peut s'expliquer par le fait que les débutants ont un salaire plus bas que les salariés de longue date.
 
-###Disparité formation initiale/apprentissage/contrat de professionalisation
+### Disparité formation initiale/apprentissage/contrat de professionalisation
 
 ```{r etude3}
 boxplot(raw_data$Salaire_annuel ~ raw_data$Type_formation)
@@ -65,7 +65,7 @@ boxplot(raw_data$Salaire_annuel ~ raw_data$Type_formation)
 
 En moyenne, les apprentis et les élèves en professionnalisation semble avoir de meilleurs salaires que les étudiants en formation initiale. Par contre, il y a beaucoup de disparités parmi les salaires de ces derniers.
 
-###Disparité des filières
+### Disparité des filières
 
 ```{r etude4}
 boxplot(raw_data$Salaire_annuel ~ raw_data$Filiere)
@@ -73,7 +73,7 @@ boxplot(raw_data$Salaire_annuel ~ raw_data$Filiere)
 
 La filière ayant les meilleurs salaires est la filière MSI. Puis viennent les SE, puis les IG et les MI. La filière la moins bien rémunérée en 2020 est STE.
 
-###Filtrage des personnes en activité
+### Filtrage des personnes en activité
 
 ```{r filtrage_activite1}
 filtered_data <- remove_rows_by_value(raw_data, "Situation", "En recherche emploi")
@@ -87,7 +87,7 @@ filtered_data <- remove_rows_by_value(filtered_data, "Situation", "Etudes")
 activite_data <- filtered_data
 ```
 
-###Disparité par nature du contrat
+### Disparité par nature du contrat
 
 ```{r etude7, warning=FALSE}
 # Filtrage de certains contrat peu représentatif
@@ -114,7 +114,7 @@ boxplot(raw_data$Salaire_annuel ~ as.numeric(raw_data$Anciennete), data = ordere
 
 Il ne semble pas avoir de corrélation entre l'ancienneté et le salaire. Il ne semble pas y avoir de tendance a augmenter ou à baisser suivant l'ancienneté.
 
-###Distribution du salaire en fonction de l'ancienneté (Groupée)
+### Distribution du salaire en fonction de l'ancienneté (Groupée)
 
 ```{r etude9}
 monthGroup <- cut(as.numeric(raw_data$Anciennete),
@@ -128,7 +128,7 @@ boxplot(raw_data$Salaire_annuel ~ monthGroup, data = raw_data)
 
 En regroupant l'ancienneté sur des périodes de 6 mois, on remarque une augmentation progressive à partir de 7 mois, mais elle n'est pas conséquente.
 
-###Distribution du salaire en fonction de France/étranger
+### Distribution du salaire en fonction de France/étranger
 
 ```{r etude10}
 boxplot(raw_data$Salaire_annuel ~ raw_data$France)
@@ -136,7 +136,7 @@ boxplot(raw_data$Salaire_annuel ~ raw_data$France)
 
 Les étudiants partis travailler à l'étranger semblent avoir de meilleurs salaires mais il y a une grande disparité pour les salaires étrangers.
 
-###Distribution du salaire en fonction du pays à l'étranger
+### Distribution du salaire en fonction du pays à l'étranger
 
 ```{r etude11, warning=FALSE}
 raw_data_filtered <- raw_data[complete.cases(raw_data$Pays) & raw_data$Pays != "" & !grepl("^\\s*$", raw_data$Pays) & !is.na(raw_data$Salaire_annuel), ]
