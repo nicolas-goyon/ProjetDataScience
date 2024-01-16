@@ -1,5 +1,4 @@
 # ui.R
-
 library(shiny)
 
 fluidPage(
@@ -7,11 +6,10 @@ fluidPage(
   sidebarLayout(
     sidebarPanel(
       radioButtons("annee", label = "Choisir une année :",
-                   choices = c("2018", "2019", "2020", "2021", "2022"),
-                   selected = "2018")
+                   choices = c("2018", "2019", "2020", "2021", "2022"))
     ),
     mainPanel(
-      # Contenu principal de la page
+      textOutput("anneeaff")
     )
   )
 )
