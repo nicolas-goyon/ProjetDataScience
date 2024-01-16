@@ -26,6 +26,14 @@ if (!requireNamespace("ggplot2", quietly = TRUE)) {
 library(ggplot2)
 ```
 
+### Fonction de filtre 
+Ceci est une fonction utilisé après pour retirer différentes lignes en fonction des valeurs dans une certain colonne. (équivalent d'un select where)
+```{r fonctionFiltre}
+remove_rows_by_value <- function(data, column_name, value_to_remove) {
+  data_filtered <- subset(data, !(data[[column_name]] == value_to_remove))
+  return(data_filtered)
+}
+```
 
 # Etude données 2018
 
@@ -323,14 +331,6 @@ summary(raw_data)
 
 Avec ces valeurs on peut déduire beaucoup de choses... 
 
-### Fonction de filtre 
-Ceci est une fonction utilisé après pour retirer différentes lignes en fonction des valeurs dans une certain colonne. (équivalent d'un select where)
-```{r fonctionFiltre}
-remove_rows_by_value <- function(data, column_name, value_to_remove) {
-  data_filtered <- subset(data, !(data[[column_name]] == value_to_remove))
-  return(data_filtered)
-}
-```
 
 ## Première étude 
 
@@ -1092,14 +1092,7 @@ summary(raw_data)
 
 Avec ces valeurs on peut déduire beaucoup de choses... 
 
-### Fonction de filtre 
-Ceci est une fonction utilisé après pour retirer différentes lignes en fonction des valeurs dans une certain colonne. (équivalent d'un select where)
-```{r fonctionFiltre}
-remove_rows_by_value <- function(data, column_name, value_to_remove) {
-  data_filtered <- subset(data, !(data[[column_name]] == value_to_remove))
-  return(data_filtered)
-}
-```
+
 
 ## Première étude 
 
@@ -1246,13 +1239,62 @@ Ici les données sont trop faible pour de réelles interprétations, sauf pour l
 
 
 
-#Etudes approfondies 
+# Etudes approfondies 
 
 
-##Analyse des données des différentes années
-##Analyse plus pousées sur les critères ayant un plus fort impact
+## Analyse des données des différentes années
+
+En se basant sur l'analyse des différentes années et de façon plus globale, voici ce que l'on peut en tirer.
+
+Critères ayant un faible impact ou aucun impact :
+- Genre
+- Année de diplôme
+- Ancienneté
+
+Critère ayant un impact modéré :
+- Type de formation (initiale, apprentissage ou contrat de professionnalisation)
+- Filière
+- Nature du contrat
+
+Critère ayant un fort impact :
+- Pays (Etranger/France ainsi qu'à l'étranger)
+
+
+Les Critères pouvant être sélectionné pour une analyse plus poussée sont :
+- Pays
+- Nature du contrat
+- Filière
+- Type de formation
+- Genre (Certes avec un faible impact général, mais pouvant avoir un meilleur impact s'il y a plus de nuances.)
+
+
+## Analyse plus pousées sur les critères ayant un plus fort impact
+
+
+Vu que l'on a récupérer des données redondantes entre les années, le choix de l'année devrait avoir un vaible impact sur les analyses approfondies.
+
+### Chargement des données
+
+```{r chargementData}
+# Trying ISO-8859-1
+base_data <- read.csv("data/data_2023.csv", sep = ",", fileEncoding = "UTF-8")
+
+# Lists specifying which columns to convert to factors and numeric
+factor_cols <- c("Date", "Identifiant", "Genre", "Annee_diplome","Type_formation","Filiere","Situation_actuelle","Secteur","Nature_contrat", "Pays","Region", "Pays_etranger", "Taille_entreprise", "Nom_entreprise", "Departement", "Intitule_poste", "Secteur_activite")
+numeric_cols <- c("Anciennete","Salaire_annuel_brut_primes")
+
+# Convert columns to factors
+base_data[factor_cols] <- lapply(base_data[factor_cols], as.factor)
+
+# Convert columns to numeric
+base_data[numeric_cols] <- lapply(base_data[numeric_cols], as.numeric)
+```
+
+### AFC
+
 
 ```{r AFC}
+raw_data <- base_data
 
 # Charger la bibliothèque CA
 library(ca)
@@ -1284,21 +1326,85 @@ summary(contingency_table)
 
 ```
 
+
+### Régression multiple
+
+#### Explication
+
+L'analyse de régression multiple indique que le modèle a une certaine significativité globale, mais la significativité individuelle des variables peut varier. Certains pays, types de contrat, filières et genres semblent avoir une influence significative sur le salaire_annuel, tandis que d'autres variables peuvent ne pas être significatives. 
+
+#### l'analyse
+
 ```{r regressionMultiple}
+raw_data <- base_data
+
+filtered_data <- remove_rows_by_value(raw_data, "Situation_actuelle", "En recherche emploi")
+filtered_data <- remove_rows_by_value(filtered_data, "Situation_actuelle", "En poursuite d'études (hors thèse) / en formation")
+filtered_data <- remove_rows_by_value(filtered_data, "Situation_actuelle", "These")
+filtered_data <- remove_rows_by_value(filtered_data, "Situation_actuelle", "Sans activité") 
+filtered_data <- remove_rows_by_value(filtered_data, "Situation_actuelle", "Volontariat")
+filtered_data <- remove_rows_by_value(filtered_data, "Situation_actuelle", "En création d'entreprise /reprise d'entreprise")
+filtered_data <- remove_rows_by_value(filtered_data, "Situation_actuelle", "Etudes")
+
+filtered_data <- remove_rows_by_value(filtered_data, "Nature_contrat", "")
+
+filtered_data <- remove_rows_by_value(filtered_data, "Salaire_annuel_brut_primes", "")
+
+filtered_data <- remove_rows_by_value(filtered_data, "Nature_contrat", "CDD a la cimenterie Lafarge de Saint Pierre La Cour depuis le 1 er mars 2022. Passage en CDI a partir de fevrier 2023")
+
+
+
+raw_data <- filtered_data
+
 # Assuming raw_data is your data frame containing the relevant variables
 
 # Convert categorical variables to factors if not done already
-raw_data$Pays <- as.factor(raw_data$Pays)
+raw_data$Pays_etranger <- as.factor(raw_data$Pays_etranger)
+
 raw_data$Nature_contrat <- as.factor(raw_data$Nature_contrat)
 raw_data$Filiere <- as.factor(raw_data$Filiere)
 raw_data$Type_formation <- as.factor(raw_data$Type_formation)
 raw_data$Genre <- as.factor(raw_data$Genre)
 
+
+# Convert Pays column to character
+raw_data$Pays_etranger <- as.character(raw_data$Pays_etranger)
+raw_data$Pays_etranger <- ifelse(raw_data$Pays == "France", "France", raw_data$Pays_etranger)
+
 # Create a linear model
-reg_model <- lm(Salaire_annuel ~ Pays + Nature_contrat + Filiere + Type_formation + Genre, data = raw_data)
+reg_model <- lm(Salaire_annuel_brut_primes ~ Filiere + Pays_etranger + Nature_contrat + Type_formation + Genre, data = raw_data)
 
 # Summary of the regression model
 summary(reg_model)
 
 ```
 
+
+
+La sortie de la régression multiple fournit plusieurs informations importantes pour interpréter le modèle. Voici une interprétation détaillée :
+
+#### Résumé Global du Modèle
+- Call: La formule utilisée pour ajuster le modèle.
+- Residuals: Statistiques des résidus, y compris le minimum, les quartiles et le maximum.
+
+#### Coefficients du Modèle
+Chaque coefficient représente l'effet de la variable correspondante sur le salaire annuel, toutes les autres variables étant maintenues constantes.
+
+- Estimate: La valeur estimée du coefficient.
+- Std. Error: L'écart type estimé du coefficient.
+- t value: La statistique de test (t-value) pour tester si le coefficient est significativement différent de zéro.
+- Pr(>|t|): La valeur p associée à la statistique de test, indiquant la significativité du coefficient.
+
+#### Intercept
+Intercept (1 not defined because of singularities): La constante (l'effet lorsque toutes les variables explicatives sont nulles). Cependant, elle peut ne pas être bien définie en raison de singularités dans les données.
+
+
+#### Interprétation des données
+
+Ici dans les données on peut remarquer que le pays à généralement un impact significatif (en se référant aux étoiles) ainsi que le type de contrat, en revanche la filère, le type de formation et le genre n'ont pas d'impact significatif
+
+
+
+#### Conclusion
+
+Pour conclure, les filières ne semblent pas avoir un impact signicatif comme on pourrait le penser à priori, le type de contrat et le pays où travailler ont cependant un impact significatif
