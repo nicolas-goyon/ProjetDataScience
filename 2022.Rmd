@@ -11,6 +11,7 @@ raw_data <- read.csv("data/data_2022.csv", sep = ",", fileEncoding = "UTF-8")
 
 Définir toutes les données comme caractère (variable qualitative) sauf le salaire
 
+
 ```{r colonnesQualitative}
 # Lists specifying which columns to convert to factors and numeric
 factor_cols <- c("Date", "Identifiant", "Genre", "Annee_diplome","Type_formation","Filiere","Situation_actuelle","Secteur","Nature_contrat", "Pays","Region", "Pays_etranger", "Taille_entreprise", "Nom_entreprise", "Departement", "Intitule_poste", "Secteur_activite")
@@ -23,7 +24,7 @@ raw_data[factor_cols] <- lapply(raw_data[factor_cols], as.factor)
 raw_data[numeric_cols] <- lapply(raw_data[numeric_cols], as.numeric)
 ```
 
-```{r affichageSummaryRawData, echo=FALSE, eval=FALSE}
+```{r affichageSummaryRawData, eval=FALSE}
 summary(raw_data)
 ```
 
@@ -42,43 +43,75 @@ remove_rows_by_value <- function(data, column_name, value_to_remove) {
 
 ### Disparité homme/femme - toute formation confondue
 ```{r etude1}
-boxplot(raw_data$Salaire_annuel_brut_primes ~ raw_data$Genre)
+ggplot(raw_data, aes(x = Genre, y = Salaire_annuel_brut_primes, fill = Genre)) +
+  geom_boxplot(width = 0.5, notch = TRUE, outlier.shape = NA) +
+  labs(title = "Différences de salaire par genre",
+       x = "Genre",
+       y = "Salaire Annuel") +
+  theme_minimal() +
+  theme(legend.position = "none")
 ```
 
-En 2019, on ne remarque pas de différence significative entre les hommes et les femmes.
-
-
-
+Idem que les autres années.
 
 ### Disparité sur les dates d'optention du diplôme
 
 ```{r etude2}
-boxplot(raw_data$Salaire_annuel_brut_primes~ raw_data$Annee_diplome)
+ggplot(raw_data, aes(x = Salaire_annuel_brut_primes, fill = as.factor(Annee_diplome))) +
+  geom_density(alpha = 0.5) +
+  labs(title = "Distribution des salaires par année de diplôme",
+       x = "Salaire Annuel",
+       fill = "Année de Diplôme") +
+  theme_minimal()
 ```
 
-L'année d'optention dans ces données n'ont pas l'air d'avoir un grand impact sur les salaires.
+La première distribution des salaires par année de diplôme pour les années 2019, 2020 et 2021 montre une répartition des données avec un pic très prononcé pour l'année 2019, indiquant une concentration élevée des salaires autour d'une gamme spécifique. En comparaison, les années 2020 et 2021 présentent des distributions moins pointues et plus étalées, suggérant une plus grande variabilité dans les salaires pour ces cohortes.
 
+Lorsque l'on compare cette distribution avec les deux autres distributions des années 2017, 2018, et 2019, puis 2018, 2019, et 2020, on observe une tendance intéressante. Les diplômés des années précédentes (2017 et 2018) ont des distributions avec des pics moins marqués et des densités qui s'étalent sur une plus large gamme de salaires, ce qui pourrait indiquer que les salaires ont eu le temps de s'ajuster avec l'expérience accumulée, menant à une plus grande dispersion.
 
+En particulier, le pic pour l'année la plus récente dans chaque graphique est toujours plus prononcé, ce qui est cohérent avec des entrées récentes sur le marché du travail où les salaires sont moins dispersés. À mesure que les cohortes vieillissent, les pics deviennent moins prononcés et les distributions plus larges, reflétant probablement une diversification des parcours professionnels et des augmentations de salaire avec l'avancement en carrière.
+
+Ces observations suggèrent que les salaires évoluent avec le temps post-diplôme, avec une tendance à une plus grande hétérogénéité à mesure que les diplômés gagnent en expérience. Pour les nouveaux diplômés, la concentration des salaires pourrait également refléter des structures de rémunération d'entrée de gamme plus standardisées.
 
 
 ### Disparité formation initiale/apprentissage/contrat de professionalisation
 ```{r etude3}
-boxplot(raw_data$Salaire_annuel_brut_primes ~ raw_data$Type_formation)
+library(ggplot2)
+
+# Supprimer les lignes où 'Type_formation' est NA ou vide
+clean_data <- raw_data[!is.na(raw_data$Type_formation) & raw_data$Type_formation != "", ]
+
+# Créer le graphique avec les données nettoyées
+ggplot(clean_data, aes(x = as.factor(Type_formation), y = Salaire_annuel_brut_primes, fill = as.factor(Type_formation))) +
+  stat_summary(fun = "mean", geom = "col") +
+  labs(title = "Moyenne des salaires par type de formation",
+       x = "Type de Formation",
+       y = "Moyenne du Salaire Annuel",
+       fill = "Type de Formation") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
 ```
 
-Les apprentis et les élèves en formation initiale semblent avoir des salaire similaires. Tandis que ceux en contrat de professionnalisation ont des salaires en moyenne similaire avec une plus grande disparité haute.
+Le diagramme "Moyenne des salaires par type de formation" illustre les salaires moyens annuels attribués aux individus en fonction de leur type de formation. L'apprentissage, représenté par la barre rouge, affiche le salaire moyen le plus élevé parmi les trois catégories. À l'opposé, la formation professionnalisante, indiquée par la barre bleue, montre le salaire moyen le plus bas. Entre les deux, la formation initiale, représentée en vert, se positionne en deuxième place avec un salaire moyen qui dépasse celui de la professionnalisation.
 
+En comparaison avec les données des années antérieures, le graphique révèle une tendance à la baisse du salaire moyen pour l'apprentissage et la professionnalisation. Par contre, la formation initiale présente une augmentation de la moyenne salariale, se démarquant ainsi des autres catégories par une évolution positive de ses salaires moyens au fil des ans.
 
 
 
 ### Disparité des filières
 
 ```{r etude4}
-boxplot(raw_data$Salaire_annuel_brut_primes ~ raw_data$Filiere)
+ggplot(raw_data, aes(x = Filiere, y = Salaire_annuel_brut_primes, fill = Filiere)) +
+  geom_violin(trim = FALSE, scale = "width", width = 0.8) +
+  geom_boxplot(width = 0.2, fill = "white", color = "black", outlier.shape = NA) +
+  labs(title = "Distribution des salaires par filière",
+       x = "Filière",
+       y = "Salaire Annuel",
+       fill = "Filière") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
 ```
-
-En 2019, les salaires se basent principalement entre 30 000 et 40 000€ sans grosses variations.
-
 
 
 ### Filtrage des personnes en activité 
@@ -98,79 +131,193 @@ activite_data <- filtered_data
 
 ### Disparité par nature du contrat
 ```{r etude7, warning=FALSE}
+library(ggplot2)
 
+# Remplacer 'activite_data' par votre dataframe réel
+# Filtrage de certains contrats peu représentatifs
+filtered_data <- raw_data[!raw_data$Nature_contrat %in% c("Service à la personne (cours particulier de mathématiques via Acadomia)", "", "18"), ]
 
-# Filtrage de certains contrat peu représentatif
-filtered_data <- remove_rows_by_value(activite_data, "Nature_contrat", "Service à la personne (cours particulier de mathématiques via Acadomia)")
-filtered_data <- remove_rows_by_value(filtered_data, "Nature_contrat", "")
+# Supposons que les catégories de contrats sont 'CDD', 'CDI', 'Intérim', etc.
+# Vous pouvez définir manuellement les couleurs pour chaque catégorie de contrat
+couleurs_contrats <- c("CDD" = "#66c2a5", "CDI" = "#fc8d62", "Intérim" = "#8da0cb", 
+                       "Stage" = "#e78ac3", "Alternance" = "#a6d854", "CTT" = "#e78ac3")
 
-ggplot(filtered_data, aes(x = Nature_contrat, y = Salaire_annuel_brut_primes)) +
+# Diagramme en boîte avec couleurs
+ggplot(filtered_data, aes(x = Nature_contrat, y = Salaire_annuel_brut_primes, fill = Nature_contrat)) +
   geom_boxplot() +
+  scale_fill_manual(values = couleurs_contrats) +  # Utiliser les couleurs définies précédemment
+  theme_minimal() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 8)) +
-  labs(title = "Salary Distribution by Contract Type", x = "Contract Type", y = "Salary")
+  labs(title = "Distribution des salaires par type de contrat", x = "Type de Contrat", y = "Salaire Annuel")
 
 ```
 
-On peut remarquer que les cdi et contrats locaux ont un net avantages par rapport aux CDD et CTT.
+Le graphique intitulé "Distribution des salaires par type de contrat" fournit une comparaison des salaires annuels en fonction de la nature du contrat de travail. À travers des boxplots, il distingue clairement trois types de contrats : les CDD (contrats à durée déterminée), les CDI (contrats à durée indéterminée) et les CTT (contrats de travail temporaire), chacun représenté par une couleur distincte.
 
+Le CDI, illustré en orange, présente une médiane de salaire supérieure à celle des deux autres types de contrats, indiquant que les employés sous CDI ont en moyenne des salaires plus élevés. La dispersion des salaires dans cette catégorie est également plus large, ce qui suggère une gamme de salaires allant des niveaux débutants aux positions très rémunérées. Les points isolés au-dessus du boxplot principal indiquent l'existence de salaires bien au-delà de la norme, soulignant la présence d'opportunités hautement rémunératrices au sein des CDI.
+
+Les CDD, représentés en turquoise, montrent une concentration plus étroite des salaires, avec une médiane inférieure à celle des CDI. Cette concentration révèle une moindre variabilité salariale, ce qui peut être attribué à la nature temporaire et souvent plus précaire de ces contrats.
+
+Quant aux CTT, affichés en rose, ils arborent la médiane la plus basse et la distribution des salaires la plus resserrée, ce qui indique non seulement des salaires généralement inférieurs mais aussi une moindre variation dans les rémunérations offertes. Cela pourrait refléter les limitations inhérentes aux emplois temporaires, qui offrent moins d'opportunités pour des salaires élevés.
+
+En résumé, le type de contrat apparaît comme un facteur déterminant des perspectives salariales. Les CDI semblent offrir des salaires plus élevés et une plus grande variabilité, reflétant la sécurité et les possibilités de carrière à long terme. Les CDD et les CTT présentent des profils de rémunération plus modestes, avec des CTT particulièrement restreints dans leur potentiel salarial. Pour les individus qui évaluent leurs options d'emploi, cette visualisation des données salariales pourrait être un outil précieux pour orienter leurs décisions professionnelles.
 
 
 ### Distribution du salaire en fonction de l'ancienneté 
 
 ```{r etude8}
 
+library(ggplot2)
+
+# Création de catégories d'ancienneté
+ordered_data$Anciennete_category <- cut(as.numeric(ordered_data$Anciennete), breaks = 5)
+
+# Diagramme en barres pour la moyenne des salaires en fonction de l'ancienneté
+ggplot(ordered_data, aes(x = Anciennete_category, y = Salaire_annuel, fill = Anciennete_category)) +
+  geom_bar(stat = "summary", fun = "mean", position = "dodge") +
+  labs(title = "Moyenne des salaires en fonction de l'ancienneté",
+       x = "Ancienneté",
+       y = "Moyenne du Salaire Annuel",
+       fill = "Ancienneté") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
 
-ordered_data <- raw_data[order(as.numeric(raw_data$Anciennete)), ]
 
-boxplot(raw_data$Salaire_annuel_brut_primes ~ as.numeric(raw_data$Anciennete), data = ordered_data)
 ```
 
-Il ne semble à priori pas avoir de lien entre l'ancienneté et le salaire sur les deux premières années, après cela, il manque des informations.
+Idem que les années précédentes.
+
+###Distribution du salaire selon le secteur
+
+```{r etude 1}
+
+library(ggplot2)
+
+# Supposons que 'Secteur' est la colonne qui indique si une personne travaille dans le secteur privé ou public.
+# Nous allons exclure les non-salariés qui, dans cet exemple, sont marqués comme 'Non salarie(e)' dans la colonne 'Secteur'.
+
+filtered_data <- raw_data[raw_data$Secteur != 'Non salarie(e)', ]
+
+# Graphique Boîte à moustaches avec deux couleurs pour le secteur privé et le secteur public
+ggplot(filtered_data, aes(x = Secteur, y = Salaire_annuel_brut_primes, fill = Secteur)) +
+  geom_boxplot(
+    width = 0.8,
+    notch = TRUE,
+    outlier.shape = NA,
+    color = "black", # La couleur des lignes du boxplot
+    alpha = 0.7
+  ) +
+  scale_fill_manual(values = c("Prive" = "pink", "Public" = "green")) + # Deux couleurs pour privé et public
+  labs(
+    title = "Distribution des salaires par secteur (Privé et Public)",
+    x = "Secteur",
+    y = "Salaire Annuel"
+  ) +
+  theme_minimal() +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1),
+    legend.position = "bottom",
+    legend.title = element_blank() # Enlève le titre de la légende
+  )
 
 
 
-### Distribution du salaire en fonction de l'ancienneté (Groupée)
-```{r etude9}
-monthGroup <- cut(as.numeric(raw_data$Anciennete),
-                               breaks = c(0, 6, 12, 24, Inf),
-                               labels = c("1-6", "7-12", "13-24", "25+"),
-                               right = FALSE)
-
-
-boxplot(raw_data$Salaire_annuel_brut_primes ~ monthGroup, data = raw_data)
 ```
 
-En regroupant l'ancienneté sur des périodes de 6 mois, on ne remarque aucun changement significatif.
+Le diagramme de distribution des salaires par type de contrat fournit un aperçu visuel comparatif des échelles salariales associées à différents types de contrats de travail. Chaque boxplot représente une catégorie contractuelle distincte avec une variation des salaires allant des postes de débutants aux plus expérimentés.
+
+Le boxplot pour le CDD (Contrat à Durée Déterminée) dénote une médiane relativement basse comparée à celle du CDI (Contrat à Durée Indéterminée), indiquant que la majorité des salariés en CDD gagnent moins que la moitié des salariés en CDI. La présence de valeurs aberrantes au-dessus de la moustache supérieure du CDD suggère que certains postes en CDD offrent des salaires exceptionnellement élevés.
+
+Le CDI présente une médiane plus élevée, ce qui est courant étant donné la nature plus stable et à long terme de ces postes. Les valeurs aberrantes, bien que moins fréquentes que pour le CDD, indiquent toujours l'existence de postes en CDI très bien rémunérés.
+
+Les autres catégories de contrats, tels que le contrat d'apprentissage ou le CTT (Contrat de Travail Temporaire), montrent des médianes et des étendues différentes, reflétant la diversité des salaires au sein de ces types de contrats. Le CTT, par exemple, affiche une médiane plus basse et une variation de salaire moins importante, soulignant la nature souvent précaire et moins rémunératrice des postes temporaires.
+
+En résumé, ce diagramme met en évidence les différences de rémunération non seulement entre les contrats à durée déterminée et indéterminée mais aussi parmi les autres formes contractuelles, offrant ainsi une compréhension de la structure salariale globale au sein du marché du travail.
 
 
 ### Distribution du salaire en fonction de France/étranger
 ```{r etude10}
-boxplot(raw_data$Salaire_annuel_brut_primes ~ raw_data$Pays)
+ggplot(raw_data, aes(x = factor(Pays), y = Salaire_annuel_brut_primes, fill = factor(Pays))) +
+  geom_violin(trim = FALSE, scale = "width", width = 0.8, alpha = 0.7) +
+  labs(
+    title = "Comparaison des salaires en fonction du pays",
+    x = "Pays",
+    y = "Salaire Annuel",
+    fill = "Pays"
+  ) +
+  theme_minimal() +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1),
+    legend.position = "bottom",
+    legend.title = element_text(size = 10)
+  )
+
 ```
 
-Ici la France à tendance à être moins bien payé que l'étranger ainsi que l'étranger ayant une plus grande dispertion de salaires contraitement à l'étranger où les salaires sont plus rassemblés.
+Le diagramme en forme de violon présente une comparaison des distributions de salaires annuels en France par rapport à l'étranger. Les différences marquées entre les deux distributions sont immédiatement visibles.
 
+Pour le "Étranger", la distribution est large avec une pointe élevée, ce qui suggère que la majorité des salaires sont concentrés autour de la médiane, mais qu'il existe également un nombre considérable de salaires très élevés, comme le montrent les longues queues de distribution. Cela pourrait indiquer que, bien que le salaire moyen à l'étranger puisse être élevé, il existe une grande disparité, avec à la fois des salaires modérés et des salaires extrêmement élevés.
+
+En revanche, la distribution pour la France est plus étroite et le corps du violon est plus compact, impliquant une concentration des salaires autour de la médiane avec moins de variance extrême. Cela pourrait refléter une plus grande uniformité des salaires en France, avec moins de disparités extrêmes entre les salaires les plus bas et les plus élevés.
+
+Ces observations suggèrent que travailler à l'étranger peut offrir un potentiel de gains plus élevés mais possiblement avec un risque plus grand d'inégalité salariale, tandis que la France pourrait offrir une plus grande sécurité en termes d'équité salariale, bien que potentiellement avec des salaires globalement moins élevés.
 
 
 
 ### Distribution du salaire en fonction du pays à l'étranger
 ```{r etude11, warning=FALSE}
-raw_data_filtered <- raw_data[complete.cases(raw_data$Pays) & raw_data$Pays != "" & !grepl("^\\s*$", raw_data$Pays) & !is.na(raw_data$Salaire_annuel), ]
+library(ggplot2)
 
-
-median_salaries <- tapply(raw_data_filtered$Salaire_annuel_brut_primes, raw_data_filtered$Pays, median)
+# Calcul de la médiane des salaires par pays
+median_salaries <- tapply(raw_data_filtered$Salaire_annuel, raw_data_filtered$Pays, median)
 median_order <- names(sort(median_salaries))
 
+# Création d'un facteur pour l'ordre des pays par médiane
 emploiFactor <- factor(raw_data_filtered$Pays, levels = median_order)
 
+# Création du diagramme en bâtonnets
+ggplot(raw_data_filtered, aes(x = emploiFactor, y = Salaire_annuel, fill = emploiFactor)) +
+  geom_bar(stat = "summary", fun = "median", color = "white", size = 0.5) +
+  theme_minimal() +  # Fond blanc
+  theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 8),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank()) +  # Suppression des lignes de grille
+  labs(title = "Médiane des Salaires par Pays", x = "Pays", y = "Médiane du Salaire Annuel",
+       fill = "Pays")  # Légende pour les couleurs des pays
 
 
-ggplot(raw_data_filtered, aes(x = emploiFactor, y = Salaire_annuel_brut_primes)) +
-  geom_boxplot(na.rm = TRUE) +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 8)) +
-  labs(title = "Salary Distribution by Country", x = "Country", y = "Salary")
 ```
 
 
-Ici les données sont trop faible pour de réelles interprétations, sauf pour l'Irlande, le Royaume-Uni, Canada et Suisse où les salaires. Le Royaume-Uni semblant être proche de la France, cependant l'Irlande, Canada et Suisse ayant un salaire nêtement plus grand.
+Idem que les années précédentes.
+
+### Distribution des salaires en fonction de la région
+
+ATTENTION : Diagramme non fonctionnel
+```{r distributionRegion}
+
+library(ggplot2)
+
+# Remove rows with non-finite values in Salaire_annuel
+raw_data <- raw_data[!is.na(raw_data$Salaire_annuel_brut_primes ) & is.finite(raw_data$Salaire_annuel_brut_primes), ]
+
+# Calculate average salary by region
+avg_salary_by_region <- tapply(raw_data$Salaire_annuel_brut_primes, raw_data$Region, mean)
+max_avg_salary_region <- names(which.max(avg_salary_by_region))
+
+# Define a color palette for each region
+color_palette <- rainbow(length(unique(raw_data$Region)))
+
+# Plotting the distribution of salaries based on region as a pie chart
+# ggplot(raw_data, aes(x = "", y = Salaire_annuel_brut_primes, fill = Region)) +
+#  geom_bar(stat = "identity", width = 1) +
+#  coord_polar("y") +
+#  theme_void() +  # Removes unnecessary elements
+#  labs(title = "Répartition des salaires par région",
+#       fill = "Région",
+#       y = "Salaire Annuel") +
+#  scale_fill_manual(values = ifelse(raw_data$Region == max_avg_salary_region, "red", color_palette))  # Highlight region with highest average salary
+```
+
+Idem que les années précédentes.

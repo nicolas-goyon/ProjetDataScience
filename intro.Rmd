@@ -8,11 +8,11 @@ output:
 
 **Introduction**
 
-Notre projet de data science se penche attentivement sur l'insertion professionnelle des ingénieurs diplômés de Polytech Montpellier, en mettant l'accent sur l'évolution des salaires à 6, 18 et 30 mois après la fin des études. Au fil d'une étude, l'école a compilé des données variées, fournissant une toile de fond essentielle pour comprendre les tenants et aboutissants post-diplôme.
+Notre projet de data science, centré sur les ingénieurs diplômés de Polytech Montpellier, vise à décortiquer l'évolution de leur insertion professionnelle, en mettant un accent particulier sur la dynamique salariale à 6, 18 et 30 mois après l'obtention du diplôme. En s'appuyant sur une riche collection de données compilées par l'école, cette étude cherche à élucider les facteurs déterminants qui influencent les trajectoires professionnelles et salariales post-diplôme.
 
-Notre objectif central est de répondre à une question pratique : quels sont les paramètres qui impactent le salaire des diplômés à la sortie des études ? Pour cela, nous analyserons plusieurs variables telles que les filières d'études, les pays d'exercice professionnel, l'année d'obtention du diplôme, la localisation en France, le secteur d'emploi (privé ou public), le type d'entreprises, le genre des diplômés, ainsi que leurs responsabilités professionnelles.
+L'objectif principal est d'identifier et d'analyser les paramètres qui ont un impact significatif sur les salaires des jeunes diplômés. Pour y parvenir, notre analyse s'étendra sur diverses variables, incluant les spécialités d'études, les zones géographiques d'exercice (tant en France qu'à l'international), l'année d'obtention du diplôme, le secteur d'activité (privé/public), la nature des entreprises employeuses et le genre des diplômés.
 
-Notre méthodologie consiste à réaliser des études de corrélation année par année, suivies d'une analyse approfondie des paramètres jugés significatifs. L'objectif ultime est de définir avec précision quels sont les facteurs spécifiques qui influent sur le salaire des ingénieurs formés par Polytech Montpellier.
+Notre approche méthodologique repose sur des études de corrélation annuelles, enrichies par une exploration approfondie des facteurs identifiés comme influents. L'ambition est de dévoiler les éléments clés qui déterminent le salaire des ingénieurs issus de Polytech Montpellier, fournissant ainsi des insights précieux pour les étudiants, l'école, et les employeurs potentiels.
 
 ## Librairies
 
@@ -21,13 +21,8 @@ if (!requireNamespace("ggplot2", quietly = TRUE)) {
   install.packages("ggplot2")
 }
 library(ggplot2)
-```
 
-### Fonction de filtre 
-Ceci est une fonction utilisée après pour retirer différentes lignes en fonction des valeurs dans une certain colonne. (équivalent d'un select where)
-```{r fonctionFiltre}
-remove_rows_by_value <- function(data, column_name, value_to_remove) {
-  data_filtered <- subset(data, !(data[[column_name]] == value_to_remove))
-  return(data_filtered)
+if(!requireNamespace("FactoMineR", quietly = TRUE)){
+  install.packages("FactoMineR")
 }
 ```

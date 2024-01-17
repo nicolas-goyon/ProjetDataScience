@@ -1,6 +1,9 @@
 # Etudes approfondies 
 
 
+## Analyse plus pousées sur les critères ayant un plus fort impact
+
+
 ## Analyse des données des différentes années
 
 En se basant sur l'analyse des différentes années et de façon plus globale, voici ce que l'on peut en tirer.
@@ -30,7 +33,7 @@ Les Critères pouvant être sélectionné pour une analyse plus poussée sont :
 ## Analyse plus pousées sur les critères ayant un plus fort impact
 
 
-Vu que l'on a récupérer des données redondantes entre les années, le choix de l'année devrait avoir un vaible impact sur les analyses approfondies.
+Vu que l'on a récupérer des données redondantes entre les années, le choix de l'année devrait avoir un faible impact sur les analyses approfondies.
 
 ### Chargement des données
 
@@ -47,57 +50,9 @@ base_data[factor_cols] <- lapply(base_data[factor_cols], as.factor)
 
 # Convert columns to numeric
 base_data[numeric_cols] <- lapply(base_data[numeric_cols], as.numeric)
-```
-
-### AFC
 
 
-```{r AFC}
-raw_data <- base_data
-
-# Charger la bibliothèque CA
-#library(ca)
-
-# Convertir les variables en facteurs si elles ne le sont pas déjà
-raw_data$Pays <- as.factor(raw_data$Pays)
-raw_data$Nature_contrat <- as.factor(raw_data$Nature_contrat)
-raw_data$Filiere <- as.factor(raw_data$Filiere)
-raw_data$Type_formation <- as.factor(raw_data$Type_formation)
-raw_data$Genre <- as.factor(raw_data$Genre)
-
-# Sélectionner les variables pour l'AFCM
-variables_afcm <- c("Pays", "Nature_contrat", "Filiere", "Type_formation", "Genre")
-
-# Sous-ensemble des données avec les variables sélectionnées
-afcm_data <- raw_data[variables_afcm]
-
-# Supprimer les lignes avec des valeurs manquantes si nécessaire
-afcm_data <- na.omit(afcm_data)
-
-contingency_table <- table(afcm_data)
-
-# Réaliser l'AFCM avec le package CA
-#afcm_result <- ca(afcm_data)
-
-# Afficher les résultats de l'AFCM
-summary(contingency_table)
-
-
-```
-
-
-### Régression multiple
-
-#### Explication
-
-L'analyse de régression multiple indique que le modèle a une certaine significativité globale, mais la significativité individuelle des variables peut varier. Certains pays, types de contrat, filières et genres semblent avoir une influence significative sur le salaire_annuel, tandis que d'autres variables peuvent ne pas être significatives. 
-
-#### l'analyse
-
-```{r regressionMultiple}
-raw_data <- base_data
-
-filtered_data <- remove_rows_by_value(raw_data, "Situation_actuelle", "En recherche emploi")
+filtered_data <- remove_rows_by_value(base_data, "Situation_actuelle", "En recherche emploi")
 filtered_data <- remove_rows_by_value(filtered_data, "Situation_actuelle", "En poursuite d'études (hors thèse) / en formation")
 filtered_data <- remove_rows_by_value(filtered_data, "Situation_actuelle", "These")
 filtered_data <- remove_rows_by_value(filtered_data, "Situation_actuelle", "Sans activité") 
@@ -113,25 +68,92 @@ filtered_data <- remove_rows_by_value(filtered_data, "Nature_contrat", "CDD a la
 
 
 
-raw_data <- filtered_data
+base_data <- filtered_data
+```
+
+### ANOVA
+
+
+```{r ANOVA}
+raw_data <- base_data
+
+
+# ANOVA pour la variable "Pays"
+anova_pays <- aov(Salaire_annuel_brut_primes ~ Pays, data = base_data)
+
+# ANOVA pour la variable "Nature_contrat"
+anova_contrat <- aov(Salaire_annuel_brut_primes ~ Nature_contrat, data = base_data)
+
+# ANOVA pour la variable "Filiere"
+anova_filiere <- aov(Salaire_annuel_brut_primes ~ Filiere, data = base_data)
+
+# ANOVA pour la variable "Type_formation"
+anova_formation <- aov(Salaire_annuel_brut_primes ~ Type_formation, data = base_data)
+
+# ANOVA pour la variable "Genre"
+anova_genre <- aov(Salaire_annuel_brut_primes ~ Genre, data = base_data)
+
+# Afficher les résultats
+summary(anova_pays)
+summary(anova_contrat)
+summary(anova_filiere)
+summary(anova_formation)
+summary(anova_genre)
+
+```
+
+  -Pays :
+        Degrés de liberté (Df) : 1 pour le groupe, 513 pour les résidus, indiquant probablement une comparaison entre deux pays.
+        Somme des carrés (Sum Sq) : Indique la variabilité totale attribuable au groupe et la variabilité non expliquée (résidus).
+        Moyenne des carrés (Mean Sq) : Variabilité moyenne par degré de liberté.
+        Valeur F : 118.6, qui est le rapport de la variance moyenne due au facteur Pays par rapport à la variance résiduelle.
+        Pr(>F) : La probabilité d'observer une telle valeur F ou plus extrême si l'hypothèse nulle est vraie. Ici, p < 2.2e-16, indiquant que les différences de salaires entre les pays sont statistiquement significatives.
+
+ -Nature_contrat :
+        Df : 7 pour le groupe, 507 pour les résidus, indiquant une comparaison entre huit types de contrats.
+        F value : 3.602, suggérant qu'il y a une différence entre les groupes.
+        Pr(>F) : p < 0.001, indiquant que la nature du contrat a un effet significatif sur les salaires.
+
+ -Filiere :
+        Df : 9 pour le groupe, ce qui suggère dix filières différentes.
+        F value : 7.648, indiquant une variation significative entre les filières.
+        Pr(>F) : p < 2.2e-16, confirmant la signification statistique des différences de salaires entre les filières.
+
+ -Type_formation :
+        Df : 2 pour le groupe, suggérant trois types de formation.
+        F value : 3.824, qui est à la limite de la significativité.
+        Pr(>F) : p = 0.0225, montrant que les différences de salaires entre les types de formation sont statistiquement significatives, mais moins fortement que pour les pays ou les filières.
+
+ - Genre :
+        Df : 2 pour le groupe, indiquant trois catégories de genre.
+        F value : 10.47, qui est élevée, suggérant une différence significative.
+        Pr(>F) : p < 3.5e-05, indiquant que les différences de salaires entre les genres sont statistiquement très significatives.
+
+Les résultats suggèrent donc que tous les facteurs testés (pays, nature du contrat, filière, type de formation, genre) ont un impact significatif sur les salaires, avec des degrés de significativité variables.
+
+### Régression multiple
+
+#### Explication
+
+L'analyse de régression multiple indique que le modèle a une certaine significativité globale, mais la significativité individuelle des variables peut varier. Certains pays, types de contrat, filières et genres semblent avoir une influence significative sur le salaire_annuel, tandis que d'autres variables peuvent ne pas être significatives. 
+
+#### l'analyse
+
+```{r regressionMultiple}
+raw_data <- base_data
+
 
 # Assuming raw_data is your data frame containing the relevant variables
 
 # Convert categorical variables to factors if not done already
-raw_data$Pays_etranger <- as.factor(raw_data$Pays_etranger)
-
+raw_data$Pays <- as.factor(raw_data$Pays)
 raw_data$Nature_contrat <- as.factor(raw_data$Nature_contrat)
 raw_data$Filiere <- as.factor(raw_data$Filiere)
 raw_data$Type_formation <- as.factor(raw_data$Type_formation)
 raw_data$Genre <- as.factor(raw_data$Genre)
 
-
-# Convert Pays column to character
-raw_data$Pays_etranger <- as.character(raw_data$Pays_etranger)
-raw_data$Pays_etranger <- ifelse(raw_data$Pays == "France", "France", raw_data$Pays_etranger)
-
 # Create a linear model
-reg_model <- lm(Salaire_annuel_brut_primes ~ Filiere + Pays_etranger + Nature_contrat + Type_formation + Genre, data = raw_data)
+reg_model <- lm(Salaire_annuel_brut_primes ~ Pays + Nature_contrat + Filiere + Type_formation + Genre, data = raw_data)
 
 # Summary of the regression model
 summary(reg_model)
@@ -162,8 +184,61 @@ Intercept (1 not defined because of singularities): La constante (l'effet lorsqu
 
 Ici dans les données on peut remarquer que le pays à généralement un impact significatif (en se référant aux étoiles) ainsi que le type de contrat, en revanche la filère, le type de formation et le genre n'ont pas d'impact significatif
 
+Cette régression a été effectuée pour comprendre comment divers facteurs (comme le pays, la nature du contrat, le type de formation et le genre) affectent le salaire annuel brut (plus primes) des individus. Voici une interprétation des résultats clés :
 
+-PaysFrance : La comparaison avec le pays de référence (probablement un autre pays non spécifié) montre une différence négative de 16909.3, ce qui signifie que le salaire en France est en moyenne inférieur à celui du pays de référence, et cette différence est statistiquement significative (p < 2e-16).
+
+-Nature_contratCDI, Nature_contratCDD, etc. : Ces coefficients représentent la différence dans le salaire annuel brut en fonction du type de contrat par rapport à la catégorie de référence (probablement un autre type de contrat non spécifié). Par exemple, être en CDI est associé à une augmentation moyenne de salaire de 4866.8 par rapport au contrat de référence. Les contrats CDI et d'expatriation ne sont pas statistiquement significatifs (p > 0.05), tandis que les contrats locaux et les CTT (contrat de travail temporaire) le sont.
+
+-FiliereIG, FiliereMAT, etc. : Ces coefficients indiquent les différences de salaire associées à chaque filière par rapport à la filière de référence. La plupart des filières montrent des différences négatives, indiquant des salaires inférieurs à la filière de référence, avec des niveaux de significativité variés.
+
+-Type_formationInitiale et Type_formationProfessionnalisation : Être dans une formation initiale est associé à une augmentation moyenne de salaire de 9043.6 par rapport à la catégorie de référence (probablement l'apprentissage), tandis que la professionalisation est associée à une augmentation de 8234.2.
+
+-GenreHomme : Être un homme est associé à une augmentation moyenne de salaire de 2387.1 par rapport à la catégorie de référence (probablement les femmes), et cette différence est statistiquement significative (p < 0.05).
+
+-Ne souhaite pas répondre : Ceux qui n'ont pas souhaité répondre au sujet de leur genre ont une différence de salaire non significative par rapport à la catégorie de référence.
+
+En conclusion, cette régression montre que plusieurs facteurs influencent le salaire annuel brut des individus. Le pays, certains types de contrat et le genre ont des effets significatifs. Le modèle a un R^2 ajusté de 0.3012, ce qui signifie qu'environ 30.12% de la variabilité du salaire annuel brut est expliquée par les variables incluses dans le modèle. La signification globale du modèle est forte (p < 2.2e-16), indiquant que le modèle est significatif dans la prédiction du salaire annuel brut.
 
 #### Conclusion
 
-Pour conclure, les filières ne semblent pas avoir un impact signicatif comme on pourrait le penser à priori, le type de contrat et le pays où travailler ont cependant un impact significatif
+En résumé, pour conclure, il apparaît que les filières ont un impact significatif, conforme à nos attentes initiales. De même, le type de contrat et le pays de travail présentent également un impact notable. Bien que les analyses ANOVA aient confirmé l'impact des variables, il semble que le type de formation et le genre affichent une influence légère et trop faible pour être clairement discernée.
+
+
+### AFC(M)
+
+```{r AFC}
+library(FactoMineR)
+
+# Sélectionner les variables d'intérêt
+variables_mca <- c("Pays", "Nature_contrat", "Filiere", "Type_formation", "Genre", "Salaire_annuel_brut_primes")
+
+# Sous-ensemble des données avec les variables sélectionnées
+data_mca <- base_data[, variables_mca]
+# Supprimer les lignes avec des valeurs manquantes
+data_mca <- na.omit(data_mca)
+
+# Effectuer l'Analyse en Correspondances Multiples (MCA)
+mca_result <- MCA(data_mca[, -6])
+
+```
+
+
+Il est difficile de définir des analayse poussées avec cette MCA, il n'y a pas réellement de données sortant du groupe.
+
+
+# Conclusion 
+
+L'analyse de la régression linéaire multiple fournit un aperçu significatif de la manière dont divers facteurs contribuent aux différences de salaire annuel brut parmi les individus. En examinant les coefficients et leur pertinence statistique, on observe que le pays de travail, la filière d'études, le type de contrat, le type de formation et le genre ont une influence notable sur les niveaux de rémunération.
+
+Le pays de travail émerge comme le déterminant le plus puissant des salaires, suggérant que les différences économiques internationales jouent un rôle crucial dans la détermination des salaires. Cette distinction peut refléter les disparités en matière de coût de la vie, de politiques fiscales et de demande de compétences spécifiques à chaque pays.
+
+La filière d'études est également un prédicteur significatif des variations de salaire. Les résultats indiquent que certaines filières conduisent à des salaires supérieurs, ce qui peut être dû à la demande sur le marché du travail pour des compétences spécialisées ou à des parcours professionnels plus lucratifs associés à ces filières.
+
+Le type de contrat détient la troisième place en termes d'impact sur les salaires, avec des contrats à durée indéterminée (CDI) qui tendent à offrir de meilleures rémunérations par rapport aux contrats temporaires ou précaires. Cette observation confirme la valeur associée à la sécurité de l'emploi et aux avantages liés aux postes permanents.
+
+En ce qui concerne le type de formation, les formations initiales et de professionalisation semblent être associées à des salaires plus élevés, soulignant l'importance de l'éducation continue et de l'acquisition de compétences en vue d'améliorer les perspectives salariales.
+
+Enfin, le genre est une variable qui continue d'influer sur le salaire, mettant en évidence l'écart de rémunération persistant entre les hommes et les femmes. Les hommes gagnent, en moyenne, plus que les femmes, ce qui appelle à une action continue pour l'équité salariale.
+
+Globalement, ces facteurs ensemble expliquent une portion significative, bien que non exhaustive, de la variabilité des salaires, laissant une marge importante pour d'autres influences non capturées par le modèle. Cette analyse confirme non seulement l'importance des facteurs individuels mais aussi la complexité de la structure salariale qui est affectée par un entrelacement de divers éléments. Cela souligne la nécessité d'approches holistiques pour comprendre pleinement les dynamiques salariales et pour élaborer des politiques visant à promouvoir des opportunités économiques équitables pour tous.
