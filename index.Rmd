@@ -24,6 +24,10 @@ if (!requireNamespace("ggplot2", quietly = TRUE)) {
   install.packages("ggplot2")
 }
 library(ggplot2)
+
+if(!requireNamespace("FactoMineR", quietly = TRUE)){
+  install.packages("FactoMineR")
+}
 ```
 
 
@@ -2422,6 +2426,121 @@ summary(contingency_table)
 ```
 
 ```{r regressionMultiple}
+
+## Analyse des données des différentes années
+
+En se basant sur l'analyse des différentes années et de façon plus globale, voici ce que l'on peut en tirer.
+
+Critères ayant un faible impact ou aucun impact :
+- Genre
+- Année de diplôme
+- Ancienneté
+
+Critère ayant un impact modéré :
+- Type de formation (initiale, apprentissage ou contrat de professionnalisation)
+- Filière
+- Nature du contrat
+
+Critère ayant un fort impact :
+- Pays (Etranger/France ainsi qu'à l'étranger)
+
+
+Les Critères pouvant être sélectionné pour une analyse plus poussée sont :
+- Pays
+- Nature du contrat
+- Filière
+- Type de formation
+- Genre (Certes avec un faible impact général, mais pouvant avoir un meilleur impact s'il y a plus de nuances.)
+
+
+## Analyse plus pousées sur les critères ayant un plus fort impact
+
+
+Vu que l'on a récupérer des données redondantes entre les années, le choix de l'année devrait avoir un vaible impact sur les analyses approfondies.
+
+### Chargement des données
+
+```{r chargementData}
+# Trying ISO-8859-1
+base_data <- read.csv("data/data_2023.csv", sep = ",", fileEncoding = "UTF-8")
+
+# Lists specifying which columns to convert to factors and numeric
+factor_cols <- c("Date", "Identifiant", "Genre", "Annee_diplome","Type_formation","Filiere","Situation_actuelle","Secteur","Nature_contrat", "Pays","Region", "Pays_etranger", "Taille_entreprise", "Nom_entreprise", "Departement", "Intitule_poste", "Secteur_activite")
+numeric_cols <- c("Anciennete","Salaire_annuel_brut_primes")
+
+# Convert columns to factors
+base_data[factor_cols] <- lapply(base_data[factor_cols], as.factor)
+
+# Convert columns to numeric
+base_data[numeric_cols] <- lapply(base_data[numeric_cols], as.numeric)
+
+
+filtered_data <- remove_rows_by_value(base_data, "Situation_actuelle", "En recherche emploi")
+filtered_data <- remove_rows_by_value(filtered_data, "Situation_actuelle", "En poursuite d'études (hors thèse) / en formation")
+filtered_data <- remove_rows_by_value(filtered_data, "Situation_actuelle", "These")
+filtered_data <- remove_rows_by_value(filtered_data, "Situation_actuelle", "Sans activité") 
+filtered_data <- remove_rows_by_value(filtered_data, "Situation_actuelle", "Volontariat")
+filtered_data <- remove_rows_by_value(filtered_data, "Situation_actuelle", "En création d'entreprise /reprise d'entreprise")
+filtered_data <- remove_rows_by_value(filtered_data, "Situation_actuelle", "Etudes")
+
+filtered_data <- remove_rows_by_value(filtered_data, "Nature_contrat", "")
+
+filtered_data <- remove_rows_by_value(filtered_data, "Salaire_annuel_brut_primes", "")
+
+filtered_data <- remove_rows_by_value(filtered_data, "Nature_contrat", "CDD a la cimenterie Lafarge de Saint Pierre La Cour depuis le 1 er mars 2022. Passage en CDI a partir de fevrier 2023")
+
+
+
+base_data <- filtered_data
+```
+
+### ANOVA
+
+
+```{r ANOVA}
+raw_data <- base_data
+
+
+# ANOVA pour la variable "Pays"
+anova_pays <- aov(Salaire_annuel_brut_primes ~ Pays, data = base_data)
+
+# ANOVA pour la variable "Nature_contrat"
+anova_contrat <- aov(Salaire_annuel_brut_primes ~ Nature_contrat, data = base_data)
+
+# ANOVA pour la variable "Filiere"
+anova_filiere <- aov(Salaire_annuel_brut_primes ~ Filiere, data = base_data)
+
+# ANOVA pour la variable "Type_formation"
+anova_formation <- aov(Salaire_annuel_brut_primes ~ Type_formation, data = base_data)
+
+# ANOVA pour la variable "Genre"
+anova_genre <- aov(Salaire_annuel_brut_primes ~ Genre, data = base_data)
+
+# Afficher les résultats
+summary(anova_pays)
+summary(anova_contrat)
+summary(anova_filiere)
+summary(anova_formation)
+summary(anova_genre)
+
+```
+
+Avec ces Anova on peut définir que toutes les variables testés ne sont pas indépendante au salaire.
+
+
+
+### Régression multiple
+
+#### Explication
+
+L'analyse de régression multiple indique que le modèle a une certaine significativité globale, mais la significativité individuelle des variables peut varier. Certains pays, types de contrat, filières et genres semblent avoir une influence significative sur le salaire_annuel, tandis que d'autres variables peuvent ne pas être significatives. 
+
+#### l'analyse
+
+```{r regressionMultiple}
+raw_data <- base_data
+
+
 # Assuming raw_data is your data frame containing the relevant variables
 
 # Convert categorical variables to factors if not done already
@@ -2439,3 +2558,54 @@ summary(reg_model)
 
 ```
 
+
+
+La sortie de la régression multiple fournit plusieurs informations importantes pour interpréter le modèle. Voici une interprétation détaillée :
+
+#### Résumé Global du Modèle
+- Call: La formule utilisée pour ajuster le modèle.
+- Residuals: Statistiques des résidus, y compris le minimum, les quartiles et le maximum.
+
+#### Coefficients du Modèle
+Chaque coefficient représente l'effet de la variable correspondante sur le salaire annuel, toutes les autres variables étant maintenues constantes.
+
+- Estimate: La valeur estimée du coefficient.
+- Std. Error: L'écart type estimé du coefficient.
+- t value: La statistique de test (t-value) pour tester si le coefficient est significativement différent de zéro.
+- Pr(>|t|): La valeur p associée à la statistique de test, indiquant la significativité du coefficient.
+
+#### Intercept
+Intercept (1 not defined because of singularities): La constante (l'effet lorsque toutes les variables explicatives sont nulles). Cependant, elle peut ne pas être bien définie en raison de singularités dans les données.
+
+
+#### Interprétation des données
+
+Ici dans les données on peut remarquer que le pays à généralement un impact significatif (en se référant aux étoiles) ainsi que le type de contrat, en revanche la filère, le type de formation et le genre n'ont pas d'impact significatif
+
+
+
+#### Conclusion
+
+Pour conclure, les filières ne semblent pas avoir un impact signicatif comme on pourrait le penser à priori, le type de contrat et le pays où travailler ont cependant un impact significatif. Même si les Anova ont défini que les variables ont un impact, il semble que les filière et genre montrent un impact léger et trop faible pour être reconaissable.
+
+
+### AFC(M)
+
+```{r AFC}
+library(FactoMineR)
+
+# Sélectionner les variables d'intérêt
+variables_mca <- c("Pays", "Nature_contrat", "Filiere", "Type_formation", "Genre", "Salaire_annuel_brut_primes")
+
+# Sous-ensemble des données avec les variables sélectionnées
+data_mca <- base_data[, variables_mca]
+# Supprimer les lignes avec des valeurs manquantes
+data_mca <- na.omit(data_mca)
+
+# Effectuer l'Analyse en Correspondances Multiples (MCA)
+mca_result <- MCA(data_mca[, -6])
+
+```
+
+
+Il est difficile de définir des analayse poussées avec cette MCA, il n'y a pas réellement de données sortant du groupe.

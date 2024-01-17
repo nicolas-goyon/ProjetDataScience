@@ -1,0 +1,33 @@
+---
+title: "Projet Data Science 2023"
+output:
+  html_document:
+    df_print: paged
+---
+
+
+**Introduction**
+
+Notre projet de data science se penche attentivement sur l'insertion professionnelle des ingénieurs diplômés de Polytech Montpellier, en mettant l'accent sur l'évolution des salaires à 6, 18 et 30 mois après la fin des études. Au fil d'une étude, l'école a compilé des données variées, fournissant une toile de fond essentielle pour comprendre les tenants et aboutissants post-diplôme.
+
+Notre objectif central est de répondre à une question pratique : quels sont les paramètres qui impactent le salaire des diplômés à la sortie des études ? Pour cela, nous analyserons plusieurs variables telles que les filières d'études, les pays d'exercice professionnel, l'année d'obtention du diplôme, la localisation en France, le secteur d'emploi (privé ou public), le type d'entreprises, le genre des diplômés, ainsi que leurs responsabilités professionnelles.
+
+Notre méthodologie consiste à réaliser des études de corrélation année par année, suivies d'une analyse approfondie des paramètres jugés significatifs. L'objectif ultime est de définir avec précision quels sont les facteurs spécifiques qui influent sur le salaire des ingénieurs formés par Polytech Montpellier.
+
+## Librairies
+
+```{r libraries}
+if (!requireNamespace("ggplot2", quietly = TRUE)) {
+  install.packages("ggplot2")
+}
+library(ggplot2)
+```
+
+### Fonction de filtre 
+Ceci est une fonction utilisée après pour retirer différentes lignes en fonction des valeurs dans une certain colonne. (équivalent d'un select where)
+```{r fonctionFiltre}
+remove_rows_by_value <- function(data, column_name, value_to_remove) {
+  data_filtered <- subset(data, !(data[[column_name]] == value_to_remove))
+  return(data_filtered)
+}
+```
