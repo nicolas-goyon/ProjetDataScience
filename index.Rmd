@@ -2132,11 +2132,11 @@ Le minimum étant pour la Corse avec 30 000€/an tandis-que l'ile-de-France est
 
 
 
-#Etudes approfondies 
+# Etudes approfondies 
 
 
-##Analyse des données des différentes années
-##Analyse plus pousées sur les critères ayant un plus fort impact
+## Analyse des données des différentes années
+## Analyse plus pousées sur les critères ayant un plus fort impact
 
 ```{r AFC}
 
@@ -2330,7 +2330,7 @@ Ici dans les données on peut remarquer que le pays à généralement un impact 
 
 #### Conclusion
 
-Pour conclure, les filières ne semblent pas avoir un impact signicatif comme on pourrait le penser à priori, le type de contrat et le pays où travailler ont cependant un impact significatif. Même si les Anova ont défini que les variables ont un impact, il semble que les filière et genre montrent un impact léger et trop faible pour être reconaissable.
+En résumé, pour conclure, il apparaît que les filières ont un impact significatif, conforme à nos attentes initiales. De même, le type de contrat et le pays de travail présentent également un impact notable. Bien que les analyses ANOVA aient confirmé l'impact des variables, il semble que le type de formation et le genre affichent une influence légère et trop faible pour être clairement discernée.
 
 
 ### AFC(M)
@@ -2353,3 +2353,40 @@ mca_result <- MCA(data_mca[, -6])
 
 
 Il est difficile de définir des analayse poussées avec cette MCA, il n'y a pas réellement de données sortant du groupe.
+
+
+# Conclusion 
+
+En résumé, voici les critères qui influent sur le salaire, classés du plus impactant au moins impactant :
+1. Pays d'accueil
+2. Filière
+3. Type de contrat
+4. Type de formation/Genre
+
+
+
+# Déroulement du projet 
+
+Pour exposer la progression de manière chronologique, initialement, nous avons rencontré des complications liées à la sélection des critères appropriés. Par exemple, nous avions initialement opté pour la sélection des intitulés de postes et des entreprises, mais le problème résidait dans la multitude de valeurs différentes. Il devenait ainsi difficile d'entreprendre une étude sans investir un temps considérable dans la consolidation des données en raison de l'impossibilité de les automatiser.
+
+Par la suite, nous sommes passés à la phase d'harmonisation des données, où de nouveaux problèmes ont émergé. En premier lieu, il était nécessaire de déterminer comment harmoniser les colonnes, puis de normaliser les valeurs. Il fallait veiller à ce que, d'un fichier à l'autre, deux valeurs signifiant la même chose soient strictement équivalentes, afin d'élaborer un script unique pour l'analyse des données. Malgré nos efforts, la coordination des valeurs d'harmonisation a posé problème, laissant nos fichiers CSV partiellement non harmonisés à ce jour.
+
+Enfin, dans la phase de développement du script d'analyse, nous n'avons pas rencontré de problèmes majeurs, mis à part ceux liés à la diversité des sources et à l'adaptation nécessaire pour chaque fichier.
+
+La répartition des tâches est la suivante :
+
+Nicolas :
+- Création d'un script d'analyse primaire (diagrammes boxplot simples mais variés pour comprendre les données initiales)
+- Mise en place d'un document partagé pour l'harmonisation, avec explication aux autres participants.
+- Création d'un fichier partiellement harmonisé pour le script primaire.
+- Adaptation du script primaire en script final pour l'analyse globale des données.
+- Sélection des critères pour l'étude approfondie.
+- Création des scripts pour l'étude approfondie (ANOVA, AFC(M) et Régression Multiple).
+
+Assia :
+- Harmonisation d'une partie des données.
+- Modification du script final pour diversifier les diagrammes et les rendre plus esthétiques et accessibles.
+
+Tom :
+- Harmonisation d'une partie des données.
+- Création du site.
