@@ -1,4 +1,0 @@
-"0","if (!requireNamespace(""ggplot2"", quietly = TRUE)) {"
-"0","  install.packages(""ggplot2"")"
-"0","}"
-"0","library(ggplot2)"

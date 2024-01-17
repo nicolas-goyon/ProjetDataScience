@@ -1,5 +1,0 @@
-"0","if (!requireNamespace(""ggplot2"", quietly = TRUE)) {"
-"0","  install.packages(""ggplot2"")"
-"0","}"
-"0","library(ggplot2)"
-"2","Warning: package ‘ggplot2’ was built under R version 4.2.3"

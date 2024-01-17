@@ -1,7 +1,0 @@
-"0","# Name of the numeric column"
-"0","numericColumn <- ""salaire"""
-"0",""
-"0","# Convert all columns to character except the numeric column"
-"0","raw_data[, setdiff(names(raw_data), numericColumn)] <- lapply(raw_data[, setdiff(names(raw_data), numericColumn)], as.character)"
-"0",""
-"0","raw_data$Date <- as.Date(raw_data$Date)"
