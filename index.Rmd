@@ -13,7 +13,7 @@ output:
 
 Notre projet de data science, centré sur les ingénieurs diplômés de Polytech Montpellier, vise à décortiquer l'évolution de leur insertion professionnelle, en mettant un accent particulier sur la dynamique salariale à 6, 18 et 30 mois après l'obtention du diplôme. En s'appuyant sur une riche collection de données compilées par l'école, cette étude cherche à élucider les facteurs déterminants qui influencent les trajectoires professionnelles et salariales post-diplôme.
 
-L'objectif principal est d'identifier et d'analyser les paramètres qui ont un impact significatif sur les salaires des jeunes diplômés. Pour y parvenir, notre analyse s'étendra sur diverses variables, incluant les spécialités d'études, les zones géographiques d'exercice (tant en France qu'à l'international), l'année d'obtention du diplôme, le secteur d'activité (privé/public), la nature des entreprises employeuses, le genre des diplômés, et leurs responsabilités professionnelles.
+L'objectif principal est d'identifier et d'analyser les paramètres qui ont un impact significatif sur les salaires des jeunes diplômés. Pour y parvenir, notre analyse s'étendra sur diverses variables, incluant les spécialités d'études, les zones géographiques d'exercice (tant en France qu'à l'international), l'année d'obtention du diplôme, le secteur d'activité (privé/public), la nature des entreprises employeuses et le genre des diplômés.
 
 Notre approche méthodologique repose sur des études de corrélation annuelles, enrichies par une exploration approfondie des facteurs identifiés comme influents. L'ambition est de dévoiler les éléments clés qui déterminent le salaire des ingénieurs issus de Polytech Montpellier, fournissant ainsi des insights précieux pour les étudiants, l'école, et les employeurs potentiels.
 
@@ -2127,48 +2127,14 @@ ggplot(raw_data, aes(x = "", y = Salaire_annuel_brut_primes, fill = Region)) +
 
 ```
 
-Le minimum étant pour la Corse avec 30 000€/an tandis-que l'ile-de-France est plus proche des 40 000€ à 45 000€, il y a un lien mais aucune région ne semble se distringuer particulièrement.
-
+Idem que les années précédentes.
 
 
 
 # Etudes approfondies 
 
 
-## Analyse des données des différentes années
 ## Analyse plus pousées sur les critères ayant un plus fort impact
-
-```{r AFC}
-
-# Charger la bibliothèque CA
-library(ca)
-
-# Convertir les variables en facteurs si elles ne le sont pas déjà
-raw_data$Pays <- as.factor(raw_data$Pays)
-raw_data$Nature_contrat <- as.factor(raw_data$Nature_contrat)
-raw_data$Filiere <- as.factor(raw_data$Filiere)
-raw_data$Type_formation <- as.factor(raw_data$Type_formation)
-raw_data$Genre <- as.factor(raw_data$Genre)
-
-# Sélectionner les variables pour l'AFCM
-variables_afcm <- c("Pays", "Nature_contrat", "Filiere", "Type_formation", "Genre")
-
-# Sous-ensemble des données avec les variables sélectionnées
-afcm_data <- raw_data[variables_afcm]
-
-# Supprimer les lignes avec des valeurs manquantes si nécessaire
-afcm_data <- na.omit(afcm_data)
-
-contingency_table <- table(afcm_data)
-
-# Réaliser l'AFCM avec le package CA
-#afcm_result <- ca(afcm_data)
-
-# Afficher les résultats de l'AFCM
-summary(contingency_table)
-
-
-```
 
 
 ## Analyse des données des différentes années
@@ -2200,7 +2166,7 @@ Les Critères pouvant être sélectionné pour une analyse plus poussée sont :
 ## Analyse plus pousées sur les critères ayant un plus fort impact
 
 
-Vu que l'on a récupérer des données redondantes entre les années, le choix de l'année devrait avoir un vaible impact sur les analyses approfondies.
+Vu que l'on a récupérer des données redondantes entre les années, le choix de l'année devrait avoir un faible impact sur les analyses approfondies.
 
 ### Chargement des données
 
@@ -2269,9 +2235,34 @@ summary(anova_genre)
 
 ```
 
-Avec ces Anova on peut définir que toutes les variables testés ne sont pas indépendante au salaire.
+  -Pays :
+        Degrés de liberté (Df) : 1 pour le groupe, 513 pour les résidus, indiquant probablement une comparaison entre deux pays.
+        Somme des carrés (Sum Sq) : Indique la variabilité totale attribuable au groupe et la variabilité non expliquée (résidus).
+        Moyenne des carrés (Mean Sq) : Variabilité moyenne par degré de liberté.
+        Valeur F : 118.6, qui est le rapport de la variance moyenne due au facteur Pays par rapport à la variance résiduelle.
+        Pr(>F) : La probabilité d'observer une telle valeur F ou plus extrême si l'hypothèse nulle est vraie. Ici, p < 2.2e-16, indiquant que les différences de salaires entre les pays sont statistiquement significatives.
 
+ -Nature_contrat :
+        Df : 7 pour le groupe, 507 pour les résidus, indiquant une comparaison entre huit types de contrats.
+        F value : 3.602, suggérant qu'il y a une différence entre les groupes.
+        Pr(>F) : p < 0.001, indiquant que la nature du contrat a un effet significatif sur les salaires.
 
+ -Filiere :
+        Df : 9 pour le groupe, ce qui suggère dix filières différentes.
+        F value : 7.648, indiquant une variation significative entre les filières.
+        Pr(>F) : p < 2.2e-16, confirmant la signification statistique des différences de salaires entre les filières.
+
+ -Type_formation :
+        Df : 2 pour le groupe, suggérant trois types de formation.
+        F value : 3.824, qui est à la limite de la significativité.
+        Pr(>F) : p = 0.0225, montrant que les différences de salaires entre les types de formation sont statistiquement significatives, mais moins fortement que pour les pays ou les filières.
+
+ - Genre :
+        Df : 2 pour le groupe, indiquant trois catégories de genre.
+        F value : 10.47, qui est élevée, suggérant une différence significative.
+        Pr(>F) : p < 3.5e-05, indiquant que les différences de salaires entre les genres sont statistiquement très significatives.
+
+Les résultats suggèrent donc que tous les facteurs testés (pays, nature du contrat, filière, type de formation, genre) ont un impact significatif sur les salaires, avec des degrés de significativité variables.
 
 ### Régression multiple
 
@@ -2326,7 +2317,21 @@ Intercept (1 not defined because of singularities): La constante (l'effet lorsqu
 
 Ici dans les données on peut remarquer que le pays à généralement un impact significatif (en se référant aux étoiles) ainsi que le type de contrat, en revanche la filère, le type de formation et le genre n'ont pas d'impact significatif
 
+Cette régression a été effectuée pour comprendre comment divers facteurs (comme le pays, la nature du contrat, le type de formation et le genre) affectent le salaire annuel brut (plus primes) des individus. Voici une interprétation des résultats clés :
 
+-PaysFrance : La comparaison avec le pays de référence (probablement un autre pays non spécifié) montre une différence négative de 16909.3, ce qui signifie que le salaire en France est en moyenne inférieur à celui du pays de référence, et cette différence est statistiquement significative (p < 2e-16).
+
+-Nature_contratCDI, Nature_contratCDD, etc. : Ces coefficients représentent la différence dans le salaire annuel brut en fonction du type de contrat par rapport à la catégorie de référence (probablement un autre type de contrat non spécifié). Par exemple, être en CDI est associé à une augmentation moyenne de salaire de 4866.8 par rapport au contrat de référence. Les contrats CDI et d'expatriation ne sont pas statistiquement significatifs (p > 0.05), tandis que les contrats locaux et les CTT (contrat de travail temporaire) le sont.
+
+-FiliereIG, FiliereMAT, etc. : Ces coefficients indiquent les différences de salaire associées à chaque filière par rapport à la filière de référence. La plupart des filières montrent des différences négatives, indiquant des salaires inférieurs à la filière de référence, avec des niveaux de significativité variés.
+
+-Type_formationInitiale et Type_formationProfessionnalisation : Être dans une formation initiale est associé à une augmentation moyenne de salaire de 9043.6 par rapport à la catégorie de référence (probablement l'apprentissage), tandis que la professionalisation est associée à une augmentation de 8234.2.
+
+-GenreHomme : Être un homme est associé à une augmentation moyenne de salaire de 2387.1 par rapport à la catégorie de référence (probablement les femmes), et cette différence est statistiquement significative (p < 0.05).
+
+-Ne souhaite pas répondre : Ceux qui n'ont pas souhaité répondre au sujet de leur genre ont une différence de salaire non significative par rapport à la catégorie de référence.
+
+En conclusion, cette régression montre que plusieurs facteurs influencent le salaire annuel brut des individus. Le pays, certains types de contrat et le genre ont des effets significatifs. Le modèle a un R^2 ajusté de 0.3012, ce qui signifie qu'environ 30.12% de la variabilité du salaire annuel brut est expliquée par les variables incluses dans le modèle. La signification globale du modèle est forte (p < 2.2e-16), indiquant que le modèle est significatif dans la prédiction du salaire annuel brut.
 
 #### Conclusion
 
@@ -2357,11 +2362,19 @@ Il est difficile de définir des analayse poussées avec cette MCA, il n'y a pas
 
 # Conclusion 
 
-En résumé, voici les critères qui influent sur le salaire, classés du plus impactant au moins impactant :
-1. Pays d'accueil
-2. Filière
-3. Type de contrat
-4. Type de formation/Genre
+L'analyse de la régression linéaire multiple fournit un aperçu significatif de la manière dont divers facteurs contribuent aux différences de salaire annuel brut parmi les individus. En examinant les coefficients et leur pertinence statistique, on observe que le pays de travail, la filière d'études, le type de contrat, le type de formation et le genre ont une influence notable sur les niveaux de rémunération.
+
+Le pays de travail émerge comme le déterminant le plus puissant des salaires, suggérant que les différences économiques internationales jouent un rôle crucial dans la détermination des salaires. Cette distinction peut refléter les disparités en matière de coût de la vie, de politiques fiscales et de demande de compétences spécifiques à chaque pays.
+
+La filière d'études est également un prédicteur significatif des variations de salaire. Les résultats indiquent que certaines filières conduisent à des salaires supérieurs, ce qui peut être dû à la demande sur le marché du travail pour des compétences spécialisées ou à des parcours professionnels plus lucratifs associés à ces filières.
+
+Le type de contrat détient la troisième place en termes d'impact sur les salaires, avec des contrats à durée indéterminée (CDI) qui tendent à offrir de meilleures rémunérations par rapport aux contrats temporaires ou précaires. Cette observation confirme la valeur associée à la sécurité de l'emploi et aux avantages liés aux postes permanents.
+
+En ce qui concerne le type de formation, les formations initiales et de professionalisation semblent être associées à des salaires plus élevés, soulignant l'importance de l'éducation continue et de l'acquisition de compétences en vue d'améliorer les perspectives salariales.
+
+Enfin, le genre est une variable qui continue d'influer sur le salaire, mettant en évidence l'écart de rémunération persistant entre les hommes et les femmes. Les hommes gagnent, en moyenne, plus que les femmes, ce qui appelle à une action continue pour l'équité salariale.
+
+Globalement, ces facteurs ensemble expliquent une portion significative, bien que non exhaustive, de la variabilité des salaires, laissant une marge importante pour d'autres influences non capturées par le modèle. Cette analyse confirme non seulement l'importance des facteurs individuels mais aussi la complexité de la structure salariale qui est affectée par un entrelacement de divers éléments. Cela souligne la nécessité d'approches holistiques pour comprendre pleinement les dynamiques salariales et pour élaborer des politiques visant à promouvoir des opportunités économiques équitables pour tous.
 
 
 
@@ -2369,7 +2382,7 @@ En résumé, voici les critères qui influent sur le salaire, classés du plus i
 
 Pour exposer la progression de manière chronologique, initialement, nous avons rencontré des complications liées à la sélection des critères appropriés. Par exemple, nous avions initialement opté pour la sélection des intitulés de postes et des entreprises, mais le problème résidait dans la multitude de valeurs différentes. Il devenait ainsi difficile d'entreprendre une étude sans investir un temps considérable dans la consolidation des données en raison de l'impossibilité de les automatiser.
 
-Par la suite, nous sommes passés à la phase d'harmonisation des données, où de nouveaux problèmes ont émergé. En premier lieu, il était nécessaire de déterminer comment harmoniser les colonnes, puis de normaliser les valeurs. Il fallait veiller à ce que, d'un fichier à l'autre, deux valeurs signifiant la même chose soient strictement équivalentes, afin d'élaborer un script unique pour l'analyse des données. Malgré nos efforts, la coordination des valeurs d'harmonisation a posé problème, laissant nos fichiers CSV partiellement non harmonisés à ce jour.
+Par la suite, nous sommes passés à la phase d'harmonisation des données, où de nouveaux problèmes ont émergé. En premier lieu, il était nécessaire de déterminer comment harmoniser les colonnes, puis de normaliser les valeurs. Il fallait veiller à ce que, d'un fichier à l'autre, deux valeurs signifiant la même chose soient strictement équivalentes, afin d'élaborer un script unique pour l'analyse des données. 
 
 Enfin, dans la phase de développement du script d'analyse, nous n'avons pas rencontré de problèmes majeurs, mis à part ceux liés à la diversité des sources et à l'adaptation nécessaire pour chaque fichier.
 
@@ -2384,9 +2397,16 @@ Nicolas :
 - Création des scripts pour l'étude approfondie (ANOVA, AFC(M) et Régression Multiple).
 
 Assia :
-- Harmonisation d'une partie des données.
-- Modification du script final pour diversifier les diagrammes et les rendre plus esthétiques et accessibles.
+- Tri de la moitié des données.
+- Harmonisation de la moitié des données.
+- Création du script final avec tous les diagrammes utilisés.
+- Harmonisation des scripts selon les fichiers.
+- Rédaction du rendu.
+- Analyse de tous les diagrammes.
+- Création script AFCM.
+- Sélection des critères pour l'étude approfondie.
+- Analyse des études approfondies.
 
 Tom :
-- Harmonisation d'une partie des données.
+- Harmonisation de la moitié des données.
 - Création du site.
