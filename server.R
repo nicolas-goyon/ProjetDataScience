@@ -1,47 +1,29 @@
-# server.R
 library(shiny)
 library(rmarkdown)
+library(htmltools)
+
+# Définir le chemin du répertoire contenant vos fichiers
+chemin_repertoire <- "./ScriptSites"
 
 shinyServer(function(input, output) {
+  output$contenu_fichier <- renderUI({
+    # Construire le chemin complet du fichier sélectionné
+    chemin_fichier <- file.path(chemin_repertoire, input$annee, input$fichier)
 
-  # Fonction pour rendre le contenu du Rmd en fonction de l'année
-  render_rmd_for_year <- function(year) {
-    fichier_rmd <- paste0(year, ".Rmd")
-    fichier_html_temp <- tempfile(fileext = ".html")
-    render_result <- render(fichier_rmd, output_file = fichier_html_temp)
-    return(fichier_html_temp)
-  }
-  
-  # Définir le chemin du fichier Rmd
-  fichier_rmd <- "intro.Rmd"
-  
-  # Créer un fichier temporaire pour le HTML
-  fichier_html_temp <- tempfile(fileext = ".html")
-  
-  # Rendre le fichier Rmd en HTML
-  render_result <- render(fichier_rmd, output_file = fichier_html_temp)
-  
-  # Affichage du contenu HTML dans l'UI Shiny
-  output$intro <- renderUI({
-    includeHTML(fichier_html_temp)
-  })
+    # Imprimer le chemin du fichier dans la console
+    cat("Chemin du fichier:", chemin_fichier, "\n")
 
-  # Observer pour réagir aux changements dans les années sélectionnées
-  observe({
-    # Vérifier si des années ont été sélectionnées
-    if (!is.null(input$annee) && length(input$annee) > 0) {
-      
-      # Sélectionner la première année (vous pouvez ajuster la logique selon vos besoins)
-      selected_year <- input$annee[1]
-      
-      # Rendre le contenu du Rmd en fonction de l'année
-      fichier_html_temp <- render_rmd_for_year(selected_year)
-      
-      # Affichage du contenu HTML dans l'UI Shiny
-      output$data <- renderUI({
-        includeHTML(fichier_html_temp)
-      })
+    # Vérifier si le fichier existe
+    if (file.exists(chemin_fichier)) {
+      # Lire le contenu HTML directement
+      contenu_html <- readLines(chemin_fichier, warn = FALSE)
+
+      # Afficher le contenu HTML
+      HTML(contenu_html)
+
+    } else {
+      # Si le fichier n'existe pas, afficher un message d'erreur
+      tags$div("Le fichier n'existe pas.")
     }
   })
-  
 })

@@ -1,0 +1,8 @@
+```{r}
+source("chargement.r")
+# Réaliser un test de Student pour comparer les moyennes de salaire entre les groupes de genre
+t_test_result <- t.test(Salaire_annuel ~ Genre, data = raw_data)
+
+# Afficher les résultats du test de Student
+print(t_test_result)
+```
