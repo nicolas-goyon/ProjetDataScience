@@ -1,0 +1,18 @@
+```{r etude32018}
+source("chargement.r")
+library(ggplot2)
+
+# Supprimer les lignes où 'Type_formation' est NA ou vide
+clean_data <- raw_data[!is.na(raw_data$Type_formation) & raw_data$Type_formation != "", ]
+
+# Créer le graphique avec les données nettoyées
+ggplot(clean_data, aes(x = as.factor(Type_formation), y = Salaire_annuel, fill = as.factor(Type_formation))) +
+  stat_summary(fun = "mean", geom = "col") +
+  labs(title = "Moyenne des salaires par type de formation",
+       x = "Type de Formation",
+       y = "Moyenne du Salaire Annuel",
+       fill = "Type de Formation") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+```

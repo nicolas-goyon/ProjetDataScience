@@ -1,0 +1,29 @@
+```{r distributionRegion2018}
+source("chargement.r")
+source("filtre_activite.r")
+library(ggplot2)
+
+# Remove rows with non-finite values in Salaire_annuel
+raw_data <- raw_data[!is.na(raw_data$Salaire_annuel_brut_primes) & is.finite(raw_data$Salaire_annuel_brut_primes), ]
+
+# Remove rows with non-finite values in other numeric columns if needed
+#raw_data <- raw_data[complete.cases(raw_data[, numeric_cols]), ]
+
+# Calculate average salary by region
+avg_salary_by_region <- tapply(raw_data$Salaire_annuel_brut_primes, raw_data$Region, mean)
+max_avg_salary_region <- names(which.max(avg_salary_by_region))
+
+# Define a color palette for each region
+color_palette <- rainbow(length(unique(raw_data$Region)))
+
+# Plotting the distribution of salaries based on region as a pie chart
+ggplot(raw_data, aes(x = "", y = Salaire_annuel_brut_primes, fill = Region)) +
+  geom_bar(stat = "identity", width = 1) +
+  coord_polar("y") +
+  theme_void() +  # Removes unnecessary elements
+  labs(title = "Répartition des salaires par région",
+       fill = "Région",
+       y = "Salaire Annuel") +
+  scale_fill_manual(values = ifelse(raw_data$Region == max_avg_salary_region, "red", color_palette))  # Highlight region with highest average salary
+
+```

@@ -1,0 +1,24 @@
+```{r etude82018}
+source("chargement.r")
+source("filtre_activite.r")
+
+library(ggplot2)
+
+ordered_data <- raw_data[order(as.numeric(raw_data$Anciennete)), ]
+
+# Création de catégories d'ancienneté (facultatif)
+ordered_data$Anciennete_category <- cut(as.numeric(ordered_data$Anciennete), breaks = 5)
+
+# Diagramme en barres pour la moyenne des salaires en fonction de l'ancienneté
+ggplot(ordered_data, aes(x = Anciennete_category, y = Salaire_annuel, fill = Anciennete_category)) +
+  geom_bar(stat = "summary", fun = "mean", position = "dodge") +
+  labs(title = "Moyenne des salaires en fonction de l'ancienneté",
+       x = "Ancienneté",
+       y = "Moyenne du Salaire Annuel",
+       fill = "Ancienneté") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+
+
+```

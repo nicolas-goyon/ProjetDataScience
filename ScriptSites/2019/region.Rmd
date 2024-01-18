@@ -1,6 +1,6 @@
 ```{r distributionRegion2018}
 source("chargement.r")
-source("fitre_activite.r")
+source("filtre_activite.r")
 library(ggplot2)
 
 # Remove rows with non-finite values in Salaire_annuel

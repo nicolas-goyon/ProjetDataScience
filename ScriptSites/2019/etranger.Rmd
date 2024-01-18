@@ -1,6 +1,6 @@
 ```{r etude112018, warning=FALSE}
 source("chargement.r")
-source("fitre_activite.r")
+source("filtre_activite.r")
 library(ggplot2)
 
 # Filtrage des données pour exclure les valeurs manquantes ou vides

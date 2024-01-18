@@ -1,0 +1,24 @@
+```{r etude72018, warning=FALSE}
+source("chargement.r")
+source("filtre_activite.r")
+library(ggplot2)
+
+# Filtrage des données en excluant certaines catégories et en supprimant les lignes vides
+filtered_data <- subset(raw_data, !Nature_contrat %in% c("Apprentissage", "Autre", "ile-de-France", ""))
+filtered_data <- na.omit(filtered_data)
+
+# Supposons que les catégories de contrats sont 'CDD', 'CDI', 'Intérim', etc.
+# Vous pouvez définir manuellement les couleurs pour chaque catégorie de contrat
+couleurs_contrats <- c("CDD" = "#66c2a5", "CDI" = "#fc8d62", "Intérim" = "#8da0cb", 
+                       "Stage" = "#e78ac3", "Alternance" = "#a6d854", "CTT" = "#e78ac3", "Contrat local"= "turquoise", "VIE"= "purple", "Contrat d'expatriation"= "blue")
+
+# Diagramme en boîte avec couleurs
+ggplot(filtered_data, aes(x = Nature_contrat, y = Salaire_annuel, fill = Nature_contrat)) +
+  geom_boxplot() +
+  scale_fill_manual(values = couleurs_contrats) +  # Utiliser les couleurs définies précédemment
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 8)) +
+  labs(title = "Distribution des salaires par type de contrat", x = "Type de Contrat", y = "Salaire Annuel")
+
+
+```

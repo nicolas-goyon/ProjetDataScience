@@ -1,0 +1,18 @@
+```{r etude102018}
+source("chargement.r")
+source("filtre_activite.r")
+ggplot(raw_data, aes(x = factor(France), y = Salaire_annuel_brut_primes, fill = factor(France))) +
+  geom_violin(trim = FALSE, scale = "width", width = 0.8, alpha = 0.7) +
+  labs(
+    title = "Comparaison des salaires en fonction du pays",
+    x = "Pays",
+    y = "Salaire Annuel",
+    fill = "Pays"
+  ) +
+  theme_minimal() +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1),
+    legend.position = "bottom",
+    legend.title = element_text(size = 10)
+  )
+```
