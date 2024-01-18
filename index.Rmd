@@ -1,15 +1,12 @@
 ---
-title: "My Website"
+title: "Etude des salaires des anciens étudiants"
 output:
-  html_document:
-    df_print: paged
+  pdf_document: default
 ---
 
 # Commun
 
-#Introduction 
-
-**Introduction**
+# Introduction 
 
 Notre projet de data science, centré sur les ingénieurs diplômés de Polytech Montpellier, vise à décortiquer l'évolution de leur insertion professionnelle, en mettant un accent particulier sur la dynamique salariale à 6, 18 et 30 mois après l'obtention du diplôme. En s'appuyant sur une riche collection de données compilées par l'école, cette étude cherche à élucider les facteurs déterminants qui influencent les trajectoires professionnelles et salariales post-diplôme.
 
@@ -35,7 +32,7 @@ if(!requireNamespace("FactoMineR", quietly = TRUE)){
 
 ## Récupération des données
 
-```{r chargementData}
+```{r chargementData2018}
 # Trying ISO-8859-1
 raw_data <- read.csv("data/data_2018.csv", sep = ";")
 ```
@@ -43,7 +40,7 @@ raw_data <- read.csv("data/data_2018.csv", sep = ";")
 
 Définir toutes les données comme caractère (variable qualitative) sauf le salaire
 
-```{r colonnesQualitative}
+```{r colonnesQualitative2018}
 # Lists specifying which columns to convert to factors and numeric
 factor_cols <- c("Date", "Identifiant", "Genre", "Annee_diplome","Type_formation","Filiere","Situation","Secteur","Nature_contrat", "France","Region", "Pays", "Taille_entreprise", "Nom_entreprise", "Departement", "Intitule_poste", "Secteur_activite")
 numeric_cols <- c("Anciennete", "Salaire_annuel", "Responsabilite_hierarchique", "Responsabilite_budget", "Responsabilite_equipe", "Responsabilite_projet", "Satisfaction_globale", "Saitisfaction_relations", "Satisfaction_salaire", "Satisfaction_autonomie", "Satisfaction_localisation")
@@ -55,7 +52,7 @@ raw_data[factor_cols] <- lapply(raw_data[factor_cols], as.factor)
 raw_data[numeric_cols] <- lapply(raw_data[numeric_cols], as.numeric)
 ```
 
-```{r affichageSummaryRawData, eval=FALSE}
+```{r affichageSummaryRawData2018, eval=FALSE}
 summary(raw_data)
 ```
 
@@ -63,7 +60,8 @@ Avec ces valeurs on peut déduire beaucoup de choses...
 
 ### Fonction de filtre 
 Ceci est une fonction utilisé après pour retirer différentes lignes en fonction des valeurs dans une certain colonne. (équivalent d'un select where)
-```{r fonctionFiltre}
+```{r fonctionFiltre2018}
+
 remove_rows_by_value <- function(data, column_name, value_to_remove) {
   data_filtered <- subset(data, !(data[[column_name]] == value_to_remove))
   return(data_filtered)
@@ -73,7 +71,7 @@ remove_rows_by_value <- function(data, column_name, value_to_remove) {
 ## Première étude 
 
 ### Disparité homme/femme - toute formation confondue
-```{r etude1}
+```{r etude12018}
 ggplot(raw_data, aes(x = Genre, y = Salaire_annuel, fill = Genre)) +
   geom_boxplot(width = 0.5, notch = TRUE, outlier.shape = NA) +
   labs(title = "Différences de salaire par genre",
@@ -91,7 +89,7 @@ En examinant la taille des boîtes, qui illustrent l'écart interquartile, nous 
 
 En conclusion, ce graphique révèle une tendance où les hommes semblent avoir un avantage salarial par rapport aux femmes dans l'échantillon étudié. Néanmoins, la similarité des distributions suggère que les écarts de salaires, au-delà de la médiane, ne sont pas marqués par des différences extrêmes. Pour une analyse complète, il serait judicieux de prendre en compte d'autres variables qui pourraient influencer ces résultats et de réaliser des tests statistiques pour évaluer la significativité des différences observées.
 
-```{r afc}
+```{r afc2018}
 # Réaliser un test de Student pour comparer les moyennes de salaire entre les groupes de genre
 t_test_result <- t.test(Salaire_annuel ~ Genre, data = raw_data)
 
@@ -102,7 +100,7 @@ print(t_test_result)
 
 ### Disparité sur les dates d'optention du diplôme
 
-```{r etude2}
+```{r etude22018}
 ggplot(raw_data, aes(x = Salaire_annuel, fill = as.factor(Annee_diplome))) +
   geom_density(alpha = 0.5) +
   labs(title = "Distribution des salaires par année de diplôme",
@@ -122,7 +120,7 @@ L'analyse de ces distributions révèle donc non seulement les conditions initia
 
 
 ### Disparité formation initiale/apprentissage/contrat de professionalisation
-```{r etude3}
+```{r etude32018}
 library(ggplot2)
 
 # Supprimer les lignes où 'Type_formation' est NA ou vide
@@ -153,7 +151,7 @@ Cette disposition des moyennes salariales peut suggérer une évolution ou un ch
 
 ### Disparité des filières
 
-```{r etude4}
+```{r etude42018}
 ggplot(raw_data, aes(x = Filiere, y = Salaire_annuel, fill = Filiere)) +
   geom_violin(trim = FALSE, scale = "width", width = 0.8) +
   geom_boxplot(width = 0.2, fill = "white", color = "black", outlier.shape = NA) +
@@ -167,7 +165,7 @@ ggplot(raw_data, aes(x = Filiere, y = Salaire_annuel, fill = Filiere)) +
 
 
 ### Filtrage des personnes en activité 
-```{r filtrage_activite}
+```{r filtrage_activite2018}
 filtered_data <- remove_rows_by_value(raw_data, "Situation", "En recherche emploi")
 filtered_data <- remove_rows_by_value(filtered_data, "Situation", "En poursuite d'études (hors thèse) / en formation")
 filtered_data <- remove_rows_by_value(filtered_data, "Situation", "These")
@@ -182,7 +180,7 @@ activite_data <- filtered_data
 
 
 ### Disparité par nature du contrat
-```{r etude7, warning=FALSE}
+```{r etude72018, warning=FALSE}
 library(ggplot2)
 
 # Filtrage des données en excluant certaines catégories et en supprimant les lignes vides
@@ -221,7 +219,7 @@ Globalement, ce graphique met en lumière les différences substantielles dans l
 
 ### Distribution du salaire en fonction de l'ancienneté 
 
-```{r etude8}
+```{r etude82018}
 
 library(ggplot2)
 
@@ -257,7 +255,7 @@ En synthèse, ce graphique démontre un lien apparent entre l'ancienneté et le 
 
 ###Distribution du salaire selon le secteur
 
-```{r etude 1}
+```{r etude1A2018}
 
 library(ggplot2)
 
@@ -309,7 +307,7 @@ En conclusion, ce graphique suggère que bien que le secteur privé puisse offri
 
 
 ### Distribution du salaire en fonction de France/étranger
-```{r etude10}
+```{r etude102018}
 ggplot(raw_data, aes(x = factor(France), y = Salaire_annuel, fill = factor(France))) +
   geom_violin(trim = FALSE, scale = "width", width = 0.8, alpha = 0.7) +
   labs(
@@ -339,7 +337,7 @@ En résumé, la comparaison des distributions des salaires montre que l'expatria
 
 
 ### Distribution du salaire en fonction du pays à l'étranger
-```{r etude11, warning=FALSE}
+```{r etude112018, warning=FALSE}
 library(ggplot2)
 
 # Filtrage des données pour exclure les valeurs manquantes ou vides
@@ -384,7 +382,7 @@ Ce graphique offre ainsi une perspective comparative utile pour comprendre les d
 
 ### Distribution des salaires en fonction de la région
 
-```{r distributionRegion}
+```{r distributionRegion2018}
 
 library(ggplot2)
 
@@ -422,7 +420,7 @@ Ces variations peuvent refléter des différences dans les marchés du travail r
 
 ## Récupération des données
 
-```{r chargementData}
+```{r chargementData2019}
 # Trying ISO-8859-1
 raw_data <- read.csv("data/data_2019.csv", sep = ";")
 ```
@@ -430,7 +428,7 @@ raw_data <- read.csv("data/data_2019.csv", sep = ";")
 
 Définir toutes les données comme caractère (variable qualitative) sauf le salaire
 
-```{r colonnesQualitative}
+```{r colonnesQualitative2019}
 # Lists specifying which columns to convert to factors and numeric
 factor_cols <- c("Date", "identifiant", "Genre", "Annee_diplome","Type_formation","Filiere","Situation","Secteur","Nature_contrat", "France","Region", "Pays", "Taille_entreprise", "Nom_entreprise", "Departement", "Intitule_poste", "Secteur_activite")
 numeric_cols <- c("Anciennete", "Salaire_annuel", "Responsabilite_hierarchique", "Responsabilite_budget", "Responsabilite_equipe", "Responsabilite_projet", "Satisfaction_globale", "Saitisfaction_relations", "Satisfaction_salaire", "Satisfaction_autonomie", "Satisfaction_localisation")
@@ -442,14 +440,14 @@ raw_data[factor_cols] <- lapply(raw_data[factor_cols], as.factor)
 raw_data[numeric_cols] <- lapply(raw_data[numeric_cols], as.numeric)
 ```
 
-```{r affichageSummaryRawData, eval=FALSE}
+```{r affichageSummaryRawData2019, eval=FALSE}
 summary(raw_data)
 ```
 Nous allons analyser le salaire en fonction des différents paramètres.
 
 ### Fonction de filtre 
 Ceci est une fonction utilisé après pour retirer différentes lignes en fonction des valeurs dans une certain colonne. (équivalent d'un select where)
-```{r fonctionFiltre}
+```{r fonctionFiltre2019}
 remove_rows_by_value <- function(data, column_name, value_to_remove) {
   data_filtered <- subset(data, !(data[[column_name]] == value_to_remove))
   return(data_filtered)
@@ -459,7 +457,7 @@ remove_rows_by_value <- function(data, column_name, value_to_remove) {
 ## Première étude 
 
 ### Disparité homme/femme - toute formation confondue
-```{r etude1}
+```{r etude12019}
 ggplot(raw_data, aes(x = Genre, y = Salaire_annuel, fill = Genre)) +
   geom_boxplot(width = 0.5, notch = TRUE, outlier.shape = NA) +
   labs(title = "Différences de salaire par genre",
@@ -481,7 +479,7 @@ Ce graphique illustre l'existence d'un écart salarial entre les genres dans le 
 
 ### Disparité sur les dates d'optention du diplôme
 
-```{r etude2}
+```{r etude22019}
 ggplot(raw_data, aes(x = Salaire_annuel, fill = as.factor(Annee_diplome))) +
   geom_density(alpha = 0.5) +
   labs(title = "Distribution des salaires par année de diplôme",
@@ -502,7 +500,7 @@ En résumé, cette analyse suggère qu'avec le temps, les diplômés tendent à 
 
 
 ### Disparité formation initiale/apprentissage/contrat de professionalisation
-```{r etude3}
+```{r etude32019}
 library(ggplot2)
 
 # Supprimer les lignes où 'Type_formation' est NA ou vide
@@ -534,7 +532,7 @@ Ce graphique suggère que le type de formation a un impact significatif sur les 
 
 ### Disparité des filières
 
-```{r etude4}
+```{r etude42019}
 ggplot(raw_data, aes(x = Filiere, y = Salaire_annuel, fill = Filiere)) +
   geom_violin(trim = FALSE, scale = "width", width = 0.8) +
   geom_boxplot(width = 0.2, fill = "white", color = "black", outlier.shape = NA) +
@@ -548,7 +546,7 @@ ggplot(raw_data, aes(x = Filiere, y = Salaire_annuel, fill = Filiere)) +
 
 
 ### Filtrage des personnes en activité 
-```{r filtrage_activite}
+```{r filtrage_activite2019}
 filtered_data <- remove_rows_by_value(raw_data, "Situation", "En recherche emploi")
 filtered_data <- remove_rows_by_value(filtered_data, "Situation", "En poursuite d'études (hors thèse) / en formation")
 filtered_data <- remove_rows_by_value(filtered_data, "Situation", "These")
@@ -563,7 +561,7 @@ activite_data <- filtered_data
 
 
 ### Disparité par nature du contrat
-```{r etude7, warning=FALSE}
+```{r etude72019, warning=FALSE}
 library(ggplot2)
 
 # Filtrage des données en excluant certaines catégories
@@ -597,7 +595,7 @@ En résumé, le type de contrat apparaît comme un facteur déterminant des pers
 
 ### Distribution du salaire en fonction de l'ancienneté 
 
-```{r etude8}
+```{r etude82019}
 
 library(ggplot2)
 
@@ -633,7 +631,7 @@ En synthèse, ce graphique démontre un lien apparent entre l'ancienneté et le 
 
 ###Distribution du salaire selon le secteur
 
-```{r etude 1}
+```{r etudeA12019}
 
 library(ggplot2)
 
@@ -674,7 +672,7 @@ ggplot(filtered_data, aes(x = Secteur, y = Salaire_annuel, fill = Secteur)) +
 
 
 ### Distribution du salaire en fonction de France/étranger
-```{r etude10}
+```{r etude102019}
 ggplot(raw_data, aes(x = factor(France), y = Salaire_annuel, fill = factor(France))) +
   geom_violin(trim = FALSE, scale = "width", width = 0.8, alpha = 0.7) +
   labs(
@@ -703,7 +701,7 @@ La distribution plus large et la médiane plus élevée à l'étranger pourraien
 
 
 ### Distribution du salaire en fonction du pays à l'étranger
-```{r etude11, warning=FALSE}
+```{r etude112019, warning=FALSE}
 library(ggplot2)
 
 # Calcul de la médiane des salaires par pays
@@ -737,7 +735,7 @@ L'analyse de ces deux distributions souligne les différences potentielles en ma
 
 ### Distribution des salaires en fonction de la région
 
-```{r distributionRegion}
+```{r distributionRegion2019}
 
 library(ggplot2)
 
@@ -787,7 +785,7 @@ Dans l'ensemble, cette visualisation offre une perspective utile sur la distribu
 
 ## Récupération des données
 
-```{r chargementData}
+```{r chargementData2020}
 # Trying ISO-8859-1
 raw_data <- read.csv("data/data_2020.csv", sep = ";")
 ```
@@ -795,7 +793,7 @@ raw_data <- read.csv("data/data_2020.csv", sep = ";")
 
 Définir toutes les données comme caractère (variable qualitative) sauf le salaire
 
-```{r colonnesQualitative}
+```{r colonnesQualitative2020}
 # Lists specifying which columns to convert to factors and numeric
 factor_cols <- c("Date", "identifiant", "Genre", "Annee_diplome","Type_formation","Filiere","Situation","Secteur","Nature_contrat", "France","Region", "Pays", "Taille_entreprise", "Nom_entreprise", "Departement", "Intitule_poste", "Secteur_activite")
 numeric_cols <- c("Anciennete", "Salaire_annuel", "Responsabilite_hierarchique", "Responsabilite_budget", "Responsabilite_equipe", "Responsabilite_projet", "Satisfaction_globale", "Saitisfaction_relations", "Satisfaction_salaire", "Satisfaction_autonomie", "Satisfaction_localisation")
@@ -807,7 +805,7 @@ raw_data[factor_cols] <- lapply(raw_data[factor_cols], as.factor)
 raw_data[numeric_cols] <- lapply(raw_data[numeric_cols], as.numeric)
 ```
 
-```{r affichageSummaryRawData, eval=FALSE}
+```{r affichageSummaryRawData2020, eval=FALSE}
 summary(raw_data)
 ```
 
@@ -815,7 +813,7 @@ Avec ces valeurs on peut déduire beaucoup de choses...
 
 ### Fonction de filtre 
 Ceci est une fonction utilisé après pour retirer différentes lignes en fonction des valeurs dans une certain colonne. (équivalent d'un select where)
-```{r fonctionFiltre}
+```{r fonctionFiltre2020}
 remove_rows_by_value <- function(data, column_name, value_to_remove) {
   data_filtered <- subset(data, !(data[[column_name]] == value_to_remove))
   return(data_filtered)
@@ -825,7 +823,7 @@ remove_rows_by_value <- function(data, column_name, value_to_remove) {
 ## Première étude 
 
 ### Disparité homme/femme - toute formation confondue
-```{r etude1}
+```{r etude12020}
 ggplot(raw_data, aes(x = Genre, y = Salaire_annuel, fill = Genre)) +
   geom_boxplot(width = 0.5, notch = TRUE, outlier.shape = NA) +
   labs(title = "Différences de salaire par genre",
@@ -846,7 +844,7 @@ En conclusion, ce graphique révèle une tendance où les hommes semblent avoir 
 
 ### Disparité sur les dates d'optention du diplôme
 
-```{r etude2}
+```{r etude22020}
 ggplot(raw_data, aes(x = Salaire_annuel, fill = as.factor(Annee_diplome))) +
   geom_density(alpha = 0.5) +
   labs(title = "Distribution des salaires par année de diplôme",
@@ -867,7 +865,7 @@ L'élargissement progressif des courbes de densité d'une année sur l'autre pou
 
 
 ### Disparité formation initiale/apprentissage/contrat de professionalisation
-```{r etude3}
+```{r etude32020}
 library(ggplot2)
 
 # Supprimer les lignes où 'Type_formation' est NA ou vide
@@ -900,7 +898,7 @@ Ces différences peuvent refléter l'accent mis par les employeurs sur les expé
 
 ### Disparité des filières
 
-```{r etude4}
+```{r etude42020}
 ggplot(raw_data, aes(x = Filiere, y = Salaire_annuel, fill = Filiere)) +
   geom_violin(trim = FALSE, scale = "width", width = 0.8) +
   geom_boxplot(width = 0.2, fill = "white", color = "black", outlier.shape = NA) +
@@ -914,7 +912,7 @@ ggplot(raw_data, aes(x = Filiere, y = Salaire_annuel, fill = Filiere)) +
 
 
 ### Filtrage des personnes en activité 
-```{r filtrage_activite}
+```{r filtrage_activite2020}
 filtered_data <- remove_rows_by_value(raw_data, "Situation", "En recherche emploi")
 filtered_data <- remove_rows_by_value(filtered_data, "Situation", "En poursuite d'études (hors thèse) / en formation")
 filtered_data <- remove_rows_by_value(filtered_data, "Situation", "These")
@@ -929,7 +927,7 @@ activite_data <- filtered_data
 
 
 ### Disparité par nature du contrat
-```{r etude7, warning=FALSE}
+```{r etude72020, warning=FALSE}
 library(ggplot2)
 
 # Remplacer 'activite_data' par votre dataframe réel
@@ -963,7 +961,7 @@ En somme, ce graphique illustre les différences de rémunération associées à
 
 ### Distribution du salaire en fonction de l'ancienneté 
 
-```{r etude8}
+```{r etude82020}
 
 library(ggplot2)
 
@@ -999,7 +997,7 @@ En synthèse, ce graphique démontre un lien apparent entre l'ancienneté et le 
 
 ###Distribution du salaire selon le secteur
 
-```{r etude 1}
+```{r etudeA12020}
 
 library(ggplot2)
 
@@ -1039,7 +1037,7 @@ ggplot(filtered_data, aes(x = Secteur, y = Salaire_annuel, fill = Secteur)) +
 
 
 ### Distribution du salaire en fonction de France/étranger
-```{r etude10}
+```{r etude102020}
 ggplot(raw_data, aes(x = factor(France), y = Salaire_annuel, fill = factor(France))) +
   geom_violin(trim = FALSE, scale = "width", width = 0.8, alpha = 0.7) +
   labs(
@@ -1065,7 +1063,7 @@ Ces observations peuvent aider à comprendre les dynamiques de rémunération et
 
 
 ### Distribution du salaire en fonction du pays à l'étranger
-```{r etude11, warning=FALSE}
+```{r etude112020, warning=FALSE}
 library(ggplot2)
 
 # Calcul de la médiane des salaires par pays
@@ -1093,7 +1091,7 @@ Idem que pour les années précédentes.
 
 ### Distribution des salaires en fonction de la région
 
-```{r distributionRegion}
+```{r distributionRegion2020}
 
 library(ggplot2)
 
@@ -1134,7 +1132,7 @@ Idem que pour les années précédentes.
 
 ## Récupération des données
 
-```{r chargementData}
+```{r chargementData2021}
 # Trying ISO-8859-1
 raw_data <- read.csv("data/data_2021.csv", sep = ",", fileEncoding = "UTF-8")
 ```
@@ -1142,7 +1140,7 @@ raw_data <- read.csv("data/data_2021.csv", sep = ",", fileEncoding = "UTF-8")
 
 Définir toutes les données comme caractère (variable qualitative) sauf le salaire
 
-```{r colonnesQualitative}
+```{r colonnesQualitative2021}
 # Lists specifying which columns to convert to factors and numeric
 factor_cols <- c("Date", "Identifiant", "Genre", "Annee_diplome","Type_formation","Filiere","Situation","Secteur","Nature_contrat", "France","Region", "Pays", "Taille_entreprise", "Nom_entreprise", "Departement", "Intitule_poste", "Secteur_activite")
 numeric_cols <- c("Anciennete", "Salaire_annuel", "Responsabilite_budget", "Responsabilite_equipe", "Responsabilite_projet", "Satisfaction_globale", "Satisfaction_salaire", "Satisfaction_autonomie", "Satisfaction_localisation")
@@ -1154,7 +1152,7 @@ raw_data[factor_cols] <- lapply(raw_data[factor_cols], as.factor)
 raw_data[numeric_cols] <- lapply(raw_data[numeric_cols], as.numeric)
 ```
 
-```{r affichageSummaryRawData, eval=FALSE}
+```{r affichageSummaryRawData2021, eval=FALSE}
 summary(raw_data)
 ```
 
@@ -1162,7 +1160,7 @@ Avec ces valeurs on peut déduire beaucoup de choses...
 
 ### Fonction de filtre 
 Ceci est une fonction utilisé après pour retirer différentes lignes en fonction des valeurs dans une certain colonne. (équivalent d'un select where)
-```{r fonctionFiltre}
+```{r fonctionFiltre2021}
 remove_rows_by_value <- function(data, column_name, value_to_remove) {
   data_filtered <- subset(data, !(data[[column_name]] == value_to_remove))
   return(data_filtered)
@@ -1172,7 +1170,7 @@ remove_rows_by_value <- function(data, column_name, value_to_remove) {
 ## Première étude 
 
 ### Disparité homme/femme - toute formation confondue
-```{r etude1}
+```{r etude12021}
 ggplot(raw_data, aes(x = Genre, y = Salaire_annuel, fill = Genre)) +
   geom_boxplot(width = 0.5, notch = TRUE, outlier.shape = NA) +
   labs(title = "Différences de salaire par genre",
@@ -1193,7 +1191,7 @@ Il est également possible que des facteurs tels que l'ancienneté, le secteur d
 
 ### Disparité sur les dates d'optention du diplôme
 
-```{r etude2}
+```{r etude22021}
 ggplot(raw_data, aes(x = Salaire_annuel, fill = as.factor(Annee_diplome))) +
   geom_density(alpha = 0.5) +
   labs(title = "Distribution des salaires par année de diplôme",
@@ -1212,7 +1210,7 @@ Cette analyse globale indique que bien que les conditions du marché pour les di
 
 
 ### Disparité formation initiale/apprentissage/contrat de professionalisation
-```{r etude3}
+```{r etude32021}
 library(ggplot2)
 
 # Supprimer les lignes où 'Type_formation' est NA ou vide
@@ -1239,7 +1237,7 @@ Il est également possible que cette différence soit due à des variations annu
 
 ### Disparité des filières
 
-```{r etude4}
+```{r etude42021}
 ggplot(raw_data, aes(x = Filiere, y = Salaire_annuel, fill = Filiere)) +
   geom_violin(trim = FALSE, scale = "width", width = 0.8) +
   geom_boxplot(width = 0.2, fill = "white", color = "black", outlier.shape = NA) +
@@ -1253,7 +1251,7 @@ ggplot(raw_data, aes(x = Filiere, y = Salaire_annuel, fill = Filiere)) +
 
 
 ### Filtrage des personnes en activité 
-```{r filtrage_activite}
+```{r filtrage_activite2021}
 filtered_data <- remove_rows_by_value(raw_data, "Situation", "En recherche emploi")
 filtered_data <- remove_rows_by_value(filtered_data, "Situation", "En poursuite d'études (hors thèse) / en formation")
 filtered_data <- remove_rows_by_value(filtered_data, "Situation", "These")
@@ -1268,7 +1266,7 @@ activite_data <- filtered_data
 
 
 ### Disparité par nature du contrat
-```{r etude7, warning=FALSE}
+```{r etude72021, warning=FALSE}
 library(ggplot2)
 
 # Remplacer 'activite_data' par votre dataframe réel
@@ -1313,7 +1311,7 @@ En résumé, le graphique met en exergue le fait que les CDI, tant nationaux qu'
 
 ### Distribution du salaire en fonction de l'ancienneté 
 
-```{r etude8}
+```{r etude82021}
 
 library(ggplot2)
 
@@ -1350,7 +1348,7 @@ En synthèse, ce graphique démontre un lien apparent entre l'ancienneté et le 
 
 ###Distribution du salaire selon le secteur
 
-```{r etude 1}
+```{r etudeA12021}
 
 library(ggplot2)
 
@@ -1388,7 +1386,7 @@ ggplot(filtered_data, aes(x = Secteur, y = Salaire_annuel, fill = Secteur)) +
 
 
 ### Distribution du salaire en fonction de France/étranger
-```{r etude10}
+```{r etude102021}
 ggplot(raw_data, aes(x = factor(France), y = Salaire_annuel, fill = factor(France))) +
   geom_violin(trim = FALSE, scale = "width", width = 0.8, alpha = 0.7) +
   labs(
@@ -1416,7 +1414,7 @@ Cette visualisation pourrait refléter les dynamiques du marché du travail glob
 
 
 ### Distribution du salaire en fonction du pays à l'étranger
-```{r etude11, warning=FALSE}
+```{r etude112021, warning=FALSE}
 library(ggplot2)
 
 # Calcul de la médiane des salaires par pays
@@ -1444,7 +1442,7 @@ Idem que les années précédentes.
 
 ### Distribution des salaires en fonction de la région
 
-```{r distributionRegion}
+```{r distributionRegion2021}
 
 library(ggplot2)
 
@@ -1485,7 +1483,7 @@ Idem que les années précédentes.
 
 ## Récupération des données
 
-```{r chargementData}
+```{r chargementData2022}
 # Trying ISO-8859-1
 raw_data <- read.csv("data/data_2022.csv", sep = ",", fileEncoding = "UTF-8")
 ```
@@ -1494,7 +1492,7 @@ raw_data <- read.csv("data/data_2022.csv", sep = ",", fileEncoding = "UTF-8")
 Définir toutes les données comme caractère (variable qualitative) sauf le salaire
 
 
-```{r colonnesQualitative}
+```{r colonnesQualitative2022}
 # Lists specifying which columns to convert to factors and numeric
 factor_cols <- c("Date", "Identifiant", "Genre", "Annee_diplome","Type_formation","Filiere","Situation_actuelle","Secteur","Nature_contrat", "Pays","Region", "Pays_etranger", "Taille_entreprise", "Nom_entreprise", "Departement", "Intitule_poste", "Secteur_activite")
 numeric_cols <- c("Anciennete","Salaire_annuel_brut", "Salaire_annuel_brut_primes", "Responsabilite_hierarchique", "Responsabilite_budget", "Responsabilite_equipe", "Responsabilite_projet", "Satisfaction_globale", "Saitisfaction_relations", "Satisfaction_salaire","Satisfaction_condition_travail", "Satisfaction_autonomie", "Satisfaction_localisation")
@@ -1506,7 +1504,7 @@ raw_data[factor_cols] <- lapply(raw_data[factor_cols], as.factor)
 raw_data[numeric_cols] <- lapply(raw_data[numeric_cols], as.numeric)
 ```
 
-```{r affichageSummaryRawData, eval=FALSE}
+```{r affichageSummaryRawData2022, eval=FALSE}
 summary(raw_data)
 ```
 
@@ -1514,7 +1512,7 @@ Avec ces valeurs on peut déduire beaucoup de choses...
 
 ### Fonction de filtre 
 Ceci est une fonction utilisé après pour retirer différentes lignes en fonction des valeurs dans une certain colonne. (équivalent d'un select where)
-```{r fonctionFiltre}
+```{r fonctionFiltre2022}
 remove_rows_by_value <- function(data, column_name, value_to_remove) {
   data_filtered <- subset(data, !(data[[column_name]] == value_to_remove))
   return(data_filtered)
@@ -1524,7 +1522,7 @@ remove_rows_by_value <- function(data, column_name, value_to_remove) {
 ## Première étude 
 
 ### Disparité homme/femme - toute formation confondue
-```{r etude1}
+```{r etude12022}
 ggplot(raw_data, aes(x = Genre, y = Salaire_annuel_brut_primes, fill = Genre)) +
   geom_boxplot(width = 0.5, notch = TRUE, outlier.shape = NA) +
   labs(title = "Différences de salaire par genre",
@@ -1538,7 +1536,7 @@ Idem que les autres années.
 
 ### Disparité sur les dates d'optention du diplôme
 
-```{r etude2}
+```{r etude22022}
 ggplot(raw_data, aes(x = Salaire_annuel_brut_primes, fill = as.factor(Annee_diplome))) +
   geom_density(alpha = 0.5) +
   labs(title = "Distribution des salaires par année de diplôme",
@@ -1557,7 +1555,7 @@ Ces observations suggèrent que les salaires évoluent avec le temps post-diplô
 
 
 ### Disparité formation initiale/apprentissage/contrat de professionalisation
-```{r etude3}
+```{r etude32022}
 library(ggplot2)
 
 # Supprimer les lignes où 'Type_formation' est NA ou vide
@@ -1583,7 +1581,7 @@ En comparaison avec les données des années antérieures, le graphique révèle
 
 ### Disparité des filières
 
-```{r etude4}
+```{r etude42022}
 ggplot(raw_data, aes(x = Filiere, y = Salaire_annuel_brut_primes, fill = Filiere)) +
   geom_violin(trim = FALSE, scale = "width", width = 0.8) +
   geom_boxplot(width = 0.2, fill = "white", color = "black", outlier.shape = NA) +
@@ -1597,7 +1595,7 @@ ggplot(raw_data, aes(x = Filiere, y = Salaire_annuel_brut_primes, fill = Filiere
 
 
 ### Filtrage des personnes en activité 
-```{r filtrage_activite}
+```{r filtrage_activite2022}
 filtered_data <- remove_rows_by_value(raw_data, "Situation", "En recherche emploi")
 filtered_data <- remove_rows_by_value(filtered_data, "Situation", "En poursuite d'études (hors thèse) / en formation")
 filtered_data <- remove_rows_by_value(filtered_data, "Situation", "These")
@@ -1612,7 +1610,7 @@ activite_data <- filtered_data
 
 
 ### Disparité par nature du contrat
-```{r etude7, warning=FALSE}
+```{r etude72022, warning=FALSE}
 library(ggplot2)
 
 # Remplacer 'activite_data' par votre dataframe réel
@@ -1647,7 +1645,7 @@ En résumé, le type de contrat apparaît comme un facteur déterminant des pers
 
 ### Distribution du salaire en fonction de l'ancienneté 
 
-```{r etude8}
+```{r etude82022}
 
 library(ggplot2)
 
@@ -1674,7 +1672,7 @@ Idem que les années précédentes.
 
 ###Distribution du salaire selon le secteur
 
-```{r etude 1}
+```{r etudeA12022}
 
 library(ggplot2)
 
@@ -1721,7 +1719,7 @@ En résumé, ce diagramme met en évidence les différences de rémunération no
 
 
 ### Distribution du salaire en fonction de France/étranger
-```{r etude10}
+```{r etude102022}
 ggplot(raw_data, aes(x = factor(Pays), y = Salaire_annuel_brut_primes, fill = factor(Pays))) +
   geom_violin(trim = FALSE, scale = "width", width = 0.8, alpha = 0.7) +
   labs(
@@ -1750,7 +1748,7 @@ Ces observations suggèrent que travailler à l'étranger peut offrir un potenti
 
 
 ### Distribution du salaire en fonction du pays à l'étranger
-```{r etude11, warning=FALSE}
+```{r etude112022, warning=FALSE}
 library(ggplot2)
 
 # Calcul de la médiane des salaires par pays
@@ -1779,7 +1777,7 @@ Idem que les années précédentes.
 ### Distribution des salaires en fonction de la région
 
 ATTENTION : Diagramme non fonctionnel
-```{r distributionRegion}
+```{r distributionRegion2022}
 
 library(ggplot2)
 
@@ -1812,7 +1810,7 @@ Idem que les années précédentes.
 
 ## Récupération des données
 
-```{r chargementData}
+```{r chargementData2023}
 # Trying ISO-8859-1
 raw_data <- read.csv("data/data_2023.csv", sep = ",", fileEncoding = "UTF-8")
 ```
@@ -1820,7 +1818,7 @@ raw_data <- read.csv("data/data_2023.csv", sep = ",", fileEncoding = "UTF-8")
 
 Définir toutes les données comme caractère (variable qualitative) sauf le salaire
 
-```{r colonnesQualitative}
+```{r colonnesQualitative2023}
 # Lists specifying which columns to convert to factors and numeric
 factor_cols <- c("Date", "Identifiant", "Genre", "Annee_diplome","Type_formation","Filiere","Situation_actuelle","Secteur","Nature_contrat", "Pays","Region", "Pays_etranger", "Taille_entreprise", "Nom_entreprise", "Departement", "Intitule_poste", "Secteur_activite")
 numeric_cols <- c("Anciennete","Salaire_annuel_brut", "Salaire_annuel_brut_primes", "Responsabilite_hierarchique", "Responsabilite_budget", "Responsabilite_equipe", "Responsabilite_projet", "Satisfaction_globale", "Satisfaction_relations", "Satisfaction_salaire", "Satisfaction_autonomie", "Satisfaction_localisation")
@@ -1832,7 +1830,7 @@ raw_data[factor_cols] <- lapply(raw_data[factor_cols], as.factor)
 raw_data[numeric_cols] <- sapply(raw_data[numeric_cols], as.numeric)
 ```
 
-```{r affichageSummaryRawData, eval=FALSE}
+```{r affichageSummaryRawData2023, eval=FALSE}
 summary(raw_data)
 ```
 
@@ -1840,7 +1838,7 @@ Avec ces valeurs on peut déduire beaucoup de choses...
 
 ### Fonction de filtre 
 Ceci est une fonction utilisé après pour retirer différentes lignes en fonction des valeurs dans une certain colonne. (équivalent d'un select where)
-```{r fonctionFiltre}
+```{r fonctionFiltre2023}
 remove_rows_by_value <- function(data, column_name, value_to_remove) {
   data_filtered <- subset(data, !(data[[column_name]] == value_to_remove))
   return(data_filtered)
@@ -1850,7 +1848,7 @@ remove_rows_by_value <- function(data, column_name, value_to_remove) {
 ## Première étude 
 
 ### Disparité homme/femme - toute formation confondue
-```{r etude1}
+```{r etude12023}
 ggplot(raw_data, aes(x = Genre, y = Salaire_annuel_brut_primes, fill = Genre)) +
   geom_boxplot(width = 0.5, notch = TRUE, outlier.shape = NA) +
   labs(title = "Différences de salaire par genre",
@@ -1871,7 +1869,7 @@ En conclusion, ce graphique révèle une tendance où les hommes semblent avoir 
 
 ### Disparité sur les dates d'optention du diplôme
 
-```{r etude2}
+```{r etude22023}
 ggplot(raw_data, aes(x = Salaire_annuel_brut_primes, fill = as.factor(Annee_diplome))) +
   geom_density(alpha = 0.5) +
   labs(title = "Distribution des salaires par année de diplôme",
@@ -1890,7 +1888,7 @@ L'analyse de ces distributions révèle donc non seulement les conditions initia
 
 
 ### Disparité formation initiale/apprentissage/contrat de professionalisation
-```{r etude3}
+```{r etude32023}
 library(ggplot2)
 
 # Supprimer les lignes où 'Type_formation' est NA ou vide
@@ -1914,7 +1912,7 @@ Le diagramme représente la moyenne des salaires annuels en fonction du type de 
 
 ### Disparité des filières
 
-```{r etude4}
+```{r etude42023}
 ggplot(raw_data, aes(x = Filiere, y = Salaire_annuel_brut_primes, fill = Filiere)) +
   geom_violin(trim = FALSE, scale = "width", width = 0.8) +
   geom_boxplot(width = 0.2, fill = "white", color = "black", outlier.shape = NA) +
@@ -1928,7 +1926,7 @@ ggplot(raw_data, aes(x = Filiere, y = Salaire_annuel_brut_primes, fill = Filiere
 
 
 ### Filtrage des personnes en activité 
-```{r filtrage_activite}
+```{r filtrage_activite2023}
 filtered_data <- remove_rows_by_value(raw_data, "Situation", "En recherche emploi")
 filtered_data <- remove_rows_by_value(filtered_data, "Situation", "En poursuite d'études (hors thèse) / en formation")
 filtered_data <- remove_rows_by_value(filtered_data, "Situation", "These")
@@ -1943,7 +1941,7 @@ activite_data <- filtered_data
 
 
 ### Disparité par nature du contrat
-```{r etude7, warning=FALSE}
+```{r etude72023, warning=FALSE}
 library(ggplot2)
 
 # Remplacer 'activite_data' par votre dataframe réel
@@ -1975,7 +1973,7 @@ Ce diagramme illustre la diversité des situations salariales en fonction du typ
 
 ### Distribution du salaire en fonction de l'ancienneté 
 
-```{r etude8}
+```{r etude82023}
 
 library(ggplot2)
 
@@ -2004,7 +2002,7 @@ Idem que les années précédentes.
 
 ###Distribution du salaire selon le secteur
 
-```{r etude 1}
+```{r etudeA12023}
 
 library(ggplot2)
 
@@ -2050,7 +2048,7 @@ En général, ce diagramme illustre les différences structurelles de rémunéra
 
 
 ### Distribution du salaire en fonction de France/étranger
-```{r etude10}
+```{r etude102023}
 ggplot(raw_data, aes(x = factor(Pays), y = Salaire_annuel_brut_primes, fill = factor(Pays))) +
   geom_violin(trim = FALSE, scale = "width", width = 0.8, alpha = 0.7) +
   labs(
@@ -2078,7 +2076,7 @@ Globalement, ce graphique suggère que, bien que la médiane des salaires en Fra
 
 
 ### Distribution du salaire en fonction du pays à l'étranger
-```{r etude11, warning=FALSE}
+```{r etude112023, warning=FALSE}
 library(ggplot2)
 
 # Calcul de la médiane des salaires par pays
@@ -2107,7 +2105,7 @@ Idem que les années précédentes.
 
 ### Distribution des salaires en fonction de la région
 
-```{r distributionRegion}
+```{r distributionRegion2023}
 
 library(ggplot2)
 
@@ -2182,7 +2180,7 @@ Vu que l'on a récupérer des données redondantes entre les années, le choix d
 
 ### Chargement des données
 
-```{r chargementData}
+```{r chargementDataApprofondie}
 # Trying ISO-8859-1
 base_data <- read.csv("data/data_2023.csv", sep = ",", fileEncoding = "UTF-8")
 
