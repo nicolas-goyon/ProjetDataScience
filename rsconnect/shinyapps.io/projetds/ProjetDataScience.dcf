@@ -1,0 +1,13 @@
+name: ProjetDataScience
+title: ProjetDataScience
+username: projetds
+account: projetds
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 10960532
+bundleId: 8158346
+url: https://projetds.shinyapps.io/ProjetDataScience/
+version: 1
+asMultiple: FALSE
+asStatic: FALSE
+ignoredFiles: .RData|_site.yml|2018.Rmd|2019.Rmd|2020.Rmd|2021.Rmd|2022.Rmd|2023.Rmd|about.Rmd|app.R|Études supplémentaires.Rmd|index.html|index.Rmd|intro.Rmd|output_file.csv|salaire_secteurs.png|site.Rmd|_site|data|index_files
