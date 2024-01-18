@@ -1,10 +1,14 @@
 ---
-title: "Etude des salaires des anciens étudiants"
+HANNOU Assia
+GOYON Nicolas
+PHILIPPE Tom
+title: "Etude des salaires des étudiants de Polytech Montpellier à la sortie des études"
 output:
   pdf_document: default
+  lien de l'application web interactive: https://projetds.shinyapps.io/ProjetDataScience/
+  
 ---
 
-# Commun
 
 # Introduction 
 
@@ -162,6 +166,21 @@ ggplot(raw_data, aes(x = Filiere, y = Salaire_annuel, fill = Filiere)) +
   theme_minimal() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 ```
+Le diagramme en violons offre une représentation visuelle de la distribution des salaires annuels pour différentes filières. Chaque violon combine les caractéristiques d'une boîte à moustaches et d'un diagramme de densité de probabilité. La largeur d'un violon à un niveau de salaire donné est proportionnelle au nombre d'observations (salariés) pour ce salaire, ce qui donne une indication de la densité des données à ce niveau.
+
+Analyse des médianes par filière :
+- Les filières IG et MSI présentent des médianes élevées, ce qui suggère que les salaires moyens dans ces domaines sont supérieurs à ceux des autres filières.
+- Les filières MI et SE suivent de près avec des médianes légèrement inférieures, indiquant que les salaires moyens sont également relativement élevés dans ces secteurs.
+- Les filières STE et EGC ont des médianes inférieures, ce qui indique que les salaires moyens sont plus bas dans ces domaines par rapport aux autres filières présentées.
+
+Analyse de la distribution par filière :
+- Les violons pour les filières IG, MI, GBA, STE sont relativement larges en haut, indiquant une plus grande variabilité des salaires élevés et la présence de salaires très hauts comparativement aux autres filières.
+- Pour les filières MSI et SE, les violons sont également larges, mais avec moins d'observations aux salaires les plus élevés, ce qui peut suggérer une répartition plus homogène des salaires autour de la médiane.
+- Les filières STE et EGC présentent des violons plus étroits, particulièrement en haut de la distribution, ce qui pourrait signifier une concentration des salaires autour de la médiane avec moins de salariés recevant des salaires très élevés.
+
+Les points en dehors des violons représentent les valeurs extrêmes, qui sont significativement plus élevées ou plus basses que la majorité des salaires dans la filière.
+
+En somme, ce diagramme montre que certaines filières comme IG et MSI sont associées à des salaires plus élevés et une plus grande hétérogénéité des rémunérations, tandis que d'autres comme STE et EGC sont caractérisées par des salaires plus homogènes et généralement plus modestes. Ces informations peuvent être utiles pour les individus évaluant les perspectives de carrière dans chaque domaine, ainsi que pour les employeurs et les responsables de l'éducation lors de l'élaboration de stratégies de formation et de recrutement.
 
 
 ### Filtrage des personnes en activité 
@@ -543,7 +562,21 @@ ggplot(raw_data, aes(x = Filiere, y = Salaire_annuel, fill = Filiere)) +
   theme_minimal() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 ```
+Le diagramme en violons offre une représentation visuelle de la distribution des salaires annuels pour différentes filières. Chaque violon combine les caractéristiques d'une boîte à moustaches et d'un diagramme de densité de probabilité. La largeur d'un violon à un niveau de salaire donné est proportionnelle au nombre d'observations (salariés) pour ce salaire, ce qui donne une indication de la densité des données à ce niveau.
 
+Analyse des médianes par filière :
+- Les filières IG et MSI présentent des médianes élevées, ce qui suggère que les salaires moyens dans ces domaines sont supérieurs à ceux des autres filières.
+- Les filières MI et SE suivent de près avec des médianes légèrement inférieures, indiquant que les salaires moyens sont également relativement élevés dans ces secteurs.
+- Les filières STE et EGC ont des médianes inférieures, ce qui indique que les salaires moyens sont plus bas dans ces domaines par rapport aux autres filières présentées.
+
+Analyse de la distribution par filière :
+- Les violons pour les filières IG, MI et GBA sont relativement larges en haut, indiquant une plus grande variabilité des salaires élevés et la présence de salaires très hauts comparativement aux autres filières.
+- Pour les filières MSI et SE, les violons sont également larges, mais avec moins d'observations aux salaires les plus élevés, ce qui peut suggérer une répartition plus homogène des salaires autour de la médiane.
+- Les filières STE et EGC présentent des violons plus étroits, particulièrement en haut de la distribution, ce qui pourrait signifier une concentration des salaires autour de la médiane avec moins de salariés recevant des salaires très élevés.
+
+Les points en dehors des violons représentent les valeurs extrêmes, qui sont significativement plus élevées ou plus basses que la majorité des salaires dans la filière.
+
+En somme, ce diagramme montre que certaines filières comme IG et MSI sont associées à des salaires plus élevés et une plus grande hétérogénéité des rémunérations, tandis que d'autres comme STE et EGC sont caractérisées par des salaires plus homogènes et généralement plus modestes. Ces informations peuvent être utiles pour les individus évaluant les perspectives de carrière dans chaque domaine, ainsi que pour les employeurs et les responsables de l'éducation lors de l'élaboration de stratégies de formation et de recrutement.
 
 ### Filtrage des personnes en activité 
 ```{r filtrage_activite2019}
@@ -667,8 +700,15 @@ ggplot(filtered_data, aes(x = Secteur, y = Salaire_annuel, fill = Secteur)) +
 
 ```
 
+Le graphique "Distribution des salaires par secteur (Privé et Public)" présente deux boxplots qui comparent les distributions des salaires annuels dans les secteurs privé et public. Les boxplots offrent une vue d'ensemble des médianes, des quartiles et des étendues des salaires au sein de chaque secteur.
 
+Le boxplot du secteur privé, coloré en rose, a une médiane qui se situe au-dessus de la moitié inférieure de la boîte, indiquant que la médiane des salaires est relativement élevée. Cependant, la dispersion des salaires, illustrée par la longueur des moustaches, est modeste, ce qui suggère une variabilité moins importante des salaires dans le secteur privé.
 
+D'autre part, le boxplot du secteur public, en vert, montre une médiane plus basse que celle du secteur privé, indiquant que les salaires médians sont inférieurs dans le secteur public. Néanmoins, l'étendue de la distribution des salaires est plus large dans le secteur public, comme le montre l'amplitude des moustaches, ce qui indique une plus grande variété dans les salaires des employés du secteur public.
+
+La présence de valeurs extrêmes ou aberrantes n'est pas notable dans ce graphique, ce qui indique que la majorité des salaires se situent dans une gamme relativement prévisible pour les deux secteurs.
+
+En conclusion, ce graphique suggère que bien que le secteur privé puisse offrir en moyenne des salaires plus élevés, le secteur public présente une plus grande hétérogénéité dans la rémunération de ses employés. Cela peut refléter une diversité des rôles et des niveaux de responsabilité plus marquée dans le secteur public ou des politiques salariales différentes.
 
 
 ### Distribution du salaire en fonction de France/étranger
@@ -776,7 +816,6 @@ L'Auvergne-Rhône-Alpes suit de près, avec un autre segment important. Cette r�
 En contraste, la Bretagne et les Pays de la Loire sont représentés par des segments plus petits, ce qui indique des moyennes de salaires inférieures dans ces régions. Cela pourrait refléter une économie moins orientée vers les industries à haute valeur ajoutée ou un tissu économique axé sur des secteurs offrant des salaires moins élevés.
 
 Dans l'ensemble, cette visualisation offre une perspective utile sur la distribution géographique des salaires en France, montrant que certaines régions, comme l'Occitanie, surpassent d'autres régions plus traditionnellement associées à la richesse économique, telles que l'Île-de-France. Elle met également en lumière les régions qui peuvent être considérées comme moins prospères du point de vue salarial, comme la Bretagne et les Pays de la Loire, et qui pourraient bénéficier de stratégies de développement économique pour améliorer la rémunération des travailleurs.
-
 
 
 
@@ -1029,9 +1068,6 @@ ggplot(filtered_data, aes(x = Secteur, y = Salaire_annuel, fill = Secteur)) +
     legend.title = element_blank() # Enlève le titre de la légende
   )
 
-
-
-
 ```
 
 
@@ -1117,9 +1153,6 @@ ggplot(raw_data, aes(x = "", y = Salaire_annuel, fill = Region)) +
        fill = "Région",
        y = "Salaire Annuel") +
   scale_fill_manual(values = ifelse(raw_data$Region == max_avg_salary_region, "red", color_palette))  # Highlight region with highest average salary
-
-
-
 
 ```
 
@@ -1248,6 +1281,19 @@ ggplot(raw_data, aes(x = Filiere, y = Salaire_annuel, fill = Filiere)) +
   theme_minimal() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 ```
+La distribution des salaires par filière, représentée sous forme de diagrammes en violons, fournit une vue d'ensemble des tendances salariales au sein d'un échantillon de travailleurs. Chaque violon révèle non seulement la médiane des salaires pour une filière donnée mais aussi la répartition complète des salaires, de la base à la cime.
+
+Le violon de la filière MSI (en violet) se distingue par une médiane élevée, indiquant que les salaires médians dans cette filière sont parmi les plus hauts de l'échantillon. La largeur du violon en son sommet suggère également une dispersion significative des salaires les plus élevés, ce qui pourrait correspondre à des postes hautement qualifiés ou à des responsabilités managériales importantes.
+
+La filière IG (en vert) présente des caractéristiques similaires à la filière MSI en termes de médiane et de distribution des salaires élevés, ce qui indique que les compétences acquises dans cette filière sont également très valorisées sur le marché du travail.
+
+Les filières GBA (en jaune) et STE (en rose) se caractérisent par des médianes inférieures, reflétant des salaires globalement plus modestes. La forme resserrée du violon pour GBA indique une concentration des salaires autour de la médiane, tandis que le violon de la filière STE montre une certaine variabilité, avec des salaires s'étendant vers le haut malgré une médiane plus basse.
+
+Quant à la filière MEA (en bleu), elle affiche une médiane centrale avec une queue supérieure étendue, ce qui dénote la présence de salaires élevés, peut-être dus à des spécialisations ou à des postes de niveau supérieur au sein de la filière.
+
+Les filières MAT, MI, et SE montrent des médianes intermédiaires et une variabilité des salaires moins marquée que pour les filières MSI et IG, mais avec une présence de salaires supérieurs qui reste notable.
+
+En somme, ces diagrammes en violons illustrent non seulement les niveaux de salaires moyens par filière mais aussi l'étendue et la dispersion des salaires au sein de chacune. Ils mettent en lumière les filières où les salaires sont non seulement élevés en médiane mais aussi largement distribués vers le haut, signalant la présence de parcours professionnels avantageux et diversifiés. Cela souligne l'importance des compétences spécialisées et de l'expérience dans la détermination des salaires dans le monde professionnel.
 
 
 ### Filtrage des personnes en activité 
@@ -1322,9 +1368,9 @@ ordered_data <- raw_data[order(as.numeric(raw_data$Anciennete)), ]
 ordered_data$Anciennete_category <- cut(as.numeric(ordered_data$Anciennete), breaks = 5)
 
 # Diagramme en barres pour la moyenne des salaires en fonction de l'ancienneté
-ggplot(ordered_data, aes(x = Anciennete_category, y = Salaire_annuel, fill = Anciennete_category)) +
+ggplot(ordered_data, aes(x = Anciennete_category, y = Salaire_annuel_brut_primes, fill = Anciennete_category)) +
   geom_bar(stat = "summary", fun = "mean", position = "dodge") +
-  labs(title = "Moyenne des salaires en fonction de l'ancienneté",
+  labs(title = "Moyenne des salaires en fonction de l'ancienneté dans le monde du travail",
        x = "Ancienneté",
        y = "Moyenne du Salaire Annuel",
        fill = "Ancienneté") +
@@ -1383,7 +1429,7 @@ ggplot(filtered_data, aes(x = Secteur, y = Salaire_annuel, fill = Secteur)) +
 
 
 ```
-
+Idem que les années précédentes.
 
 ### Distribution du salaire en fonction de France/étranger
 ```{r etude102021}
@@ -1410,71 +1456,6 @@ Pour "Étranger", le violon s'élargit considérablement au milieu, indiquant qu
 En revanche, le violon représentant la France montre une concentration plus étroite des salaires, avec une densité plus élevée autour de la médiane et moins de valeurs extrêmes. La queue supérieure est plus courte, ce qui indique que moins de travailleurs atteignent les salaires les plus élevés comparativement à leurs homologues à l'étranger.
 
 Cette visualisation pourrait refléter les dynamiques du marché du travail global, où le travail à l'étranger peut être associé à des rémunérations plus compétitives ou à des avantages liés à l'expatriation. Elle pourrait aussi pointer vers des différences dans la structure des industries, des niveaux de vie ou des politiques salariales entre la France et d'autres pays.
-
-
-
-### Distribution du salaire en fonction du pays à l'étranger
-```{r etude112021, warning=FALSE}
-library(ggplot2)
-
-# Calcul de la médiane des salaires par pays
-median_salaries <- tapply(raw_data_filtered$Salaire_annuel, raw_data_filtered$Pays, median)
-median_order <- names(sort(median_salaries))
-
-# Création d'un facteur pour l'ordre des pays par médiane
-emploiFactor <- factor(raw_data_filtered$Pays, levels = median_order)
-
-# Création du diagramme en bâtonnets
-ggplot(raw_data_filtered, aes(x = emploiFactor, y = Salaire_annuel, fill = emploiFactor)) +
-  geom_bar(stat = "summary", fun = "median", color = "white", size = 0.5) +
-  theme_minimal() +  # Fond blanc
-  theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 8),
-        panel.grid.major = element_blank(),
-        panel.grid.minor = element_blank()) +  # Suppression des lignes de grille
-  labs(title = "Médiane des Salaires par Pays", x = "Pays", y = "Médiane du Salaire Annuel",
-       fill = "Pays")  # Légende pour les couleurs des pays
-
-
-```
-
-
-Idem que les années précédentes.
-
-### Distribution des salaires en fonction de la région
-
-```{r distributionRegion2021}
-
-library(ggplot2)
-
-# Remove rows with non-finite values in Salaire_annuel
-raw_data <- raw_data[!is.na(raw_data$Salaire_annuel) & is.finite(raw_data$Salaire_annuel), ]
-
-# Remove rows with non-finite values in other numeric columns if needed
-# raw_data <- raw_data[complete.cases(raw_data[, numeric_cols]), ]
-
-# Calculate average salary by region
-avg_salary_by_region <- tapply(raw_data$Salaire_annuel, raw_data$Region, mean)
-max_avg_salary_region <- names(which.max(avg_salary_by_region))
-
-# Define a color palette for each region
-color_palette <- rainbow(length(unique(raw_data$Region)))
-
-# Plotting the distribution of salaries based on region as a pie chart
-ggplot(raw_data, aes(x = "", y = Salaire_annuel, fill = Region)) +
-  geom_bar(stat = "identity", width = 1) +
-  coord_polar("y") +
-  theme_void() +  # Removes unnecessary elements
-  labs(title = "Répartition des salaires par région",
-       fill = "Région",
-       y = "Salaire Annuel") +
-  scale_fill_manual(values = ifelse(raw_data$Region == max_avg_salary_region, "red", color_palette))  # Highlight region with highest average salary
-
-
-
-
-```
-
-Idem que les années précédentes.
 
 
 
@@ -1592,7 +1573,7 @@ ggplot(raw_data, aes(x = Filiere, y = Salaire_annuel_brut_primes, fill = Filiere
   theme_minimal() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 ```
-
+On voit que les tendances sont les mêmes que les années précédentes.
 
 ### Filtrage des personnes en activité 
 ```{r filtrage_activite2022}
@@ -1668,7 +1649,14 @@ ggplot(ordered_data, aes(x = Anciennete_category, y = Salaire_annuel_brut_primes
 
 ```
 
-Idem que les années précédentes.
+Le diagramme présente la moyenne des salaires en fonction de l'ancienneté, avec une tendance inhabituelle par rapport aux années antérieures. Habituellement, on observe une croissance continue des salaires avec l'augmentation de l'ancienneté, mais le graphique de 2022 montre une progression suivie d'une régression.
+
+Dans les premiers intervalles d'ancienneté, [0,82-16,4] et [16,4-32,8], il y a une augmentation progressive du salaire moyen, ce qui est cohérent avec l'expérience acquise sur le marché du travail. Cependant, dans l'intervalle suivant, [32,8-49,2], il y a un pic, où le salaire moyen atteint son apogée avant de diminuer dans la tranche d'ancienneté [65,8-82,1]. Cette diminution pourrait être due à plusieurs facteurs, notamment le départ à la retraite de travailleurs hautement rémunérés ou des changements dans les structures de rémunération qui favorisent moins l'ancienneté. De plus, il pourrait s'agir de l'impact de la pandémie de COVID-19 qui a commencé fin 2019 et ses répercussions économiques, qui ont pu influencer les structures salariales et les opportunités de carrière.
+
+Le groupe "NA" représente les données manquantes ou non applicables, et ne peut donc pas être directement comparé aux autres groupes en termes de tendances salariales.
+
+En conclusion, les données de 2022 suggèrent une évolution des salaires qui ne correspond pas à la progression linéaire attendue avec l'ancienneté. Cette situation pourrait refléter des ajustements économiques spécifiques à cette période, des changements dans les politiques de rémunération ou les effets de la pandémie qui ont perturbé les tendances salariales habituelles.
+
 
 ###Distribution du salaire selon le secteur
 
@@ -1747,64 +1735,6 @@ Ces observations suggèrent que travailler à l'étranger peut offrir un potenti
 
 
 
-### Distribution du salaire en fonction du pays à l'étranger
-```{r etude112022, warning=FALSE}
-library(ggplot2)
-
-# Calcul de la médiane des salaires par pays
-median_salaries <- tapply(raw_data_filtered$Salaire_annuel, raw_data_filtered$Pays, median)
-median_order <- names(sort(median_salaries))
-
-# Création d'un facteur pour l'ordre des pays par médiane
-emploiFactor <- factor(raw_data_filtered$Pays, levels = median_order)
-
-# Création du diagramme en bâtonnets
-ggplot(raw_data_filtered, aes(x = emploiFactor, y = Salaire_annuel, fill = emploiFactor)) +
-  geom_bar(stat = "summary", fun = "median", color = "white", size = 0.5) +
-  theme_minimal() +  # Fond blanc
-  theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 8),
-        panel.grid.major = element_blank(),
-        panel.grid.minor = element_blank()) +  # Suppression des lignes de grille
-  labs(title = "Médiane des Salaires par Pays", x = "Pays", y = "Médiane du Salaire Annuel",
-       fill = "Pays")  # Légende pour les couleurs des pays
-
-
-```
-
-
-Idem que les années précédentes.
-
-### Distribution des salaires en fonction de la région
-
-ATTENTION : Diagramme non fonctionnel
-```{r distributionRegion2022}
-
-library(ggplot2)
-
-# Remove rows with non-finite values in Salaire_annuel
-raw_data <- raw_data[!is.na(raw_data$Salaire_annuel_brut_primes ) & is.finite(raw_data$Salaire_annuel_brut_primes), ]
-
-# Calculate average salary by region
-avg_salary_by_region <- tapply(raw_data$Salaire_annuel_brut_primes, raw_data$Region, mean)
-max_avg_salary_region <- names(which.max(avg_salary_by_region))
-
-# Define a color palette for each region
-color_palette <- rainbow(length(unique(raw_data$Region)))
-
-# Plotting the distribution of salaries based on region as a pie chart
-# ggplot(raw_data, aes(x = "", y = Salaire_annuel_brut_primes, fill = Region)) +
-#  geom_bar(stat = "identity", width = 1) +
-#  coord_polar("y") +
-#  theme_void() +  # Removes unnecessary elements
-#  labs(title = "Répartition des salaires par région",
-#       fill = "Région",
-#       y = "Salaire Annuel") +
-#  scale_fill_manual(values = ifelse(raw_data$Region == max_avg_salary_region, "red", color_palette))  # Highlight region with highest average salary
-```
-
-Idem que les années précédentes.
-
-
 
 # Etude données 2023
 
@@ -1878,13 +1808,13 @@ ggplot(raw_data, aes(x = Salaire_annuel_brut_primes, fill = as.factor(Annee_dipl
   theme_minimal()
 ```
 
-Le graphique en question, "Distribution des salaires par année de diplôme", met en lumière les nuances subtiles des trajectoires salariales des diplômés de Polytech Montpellier, sur une période couvrant trois années distinctes. Observons d'abord que les courbes de densité pour les années 2016 et 2017 montrent une forte concentration autour d'une valeur modale, suggérant que la plupart des diplômés de ces années se regroupent autour d'un salaire annuel commun. Ce phénomène pourrait indiquer une certaine stabilité dans les conditions du marché de l'emploi ou dans les politiques de rémunération qui prévalent peu de temps après l'obtention du diplôme.
+Le graphique "Distribution des salaires par année de diplôme" présente les tendances des salaires annuels des diplômés de Polytech Montpellier pour les années 2020, 2021 et 2022. Comme les années précédentes, les courbes de densité pour 2020 et 2021 montrent des pics bien définis, indiquant une concentration des salaires autour de valeurs modales spécifiques. Ceci suggère une certaine cohérence dans les conditions du marché de l'emploi peu après la graduation, où la plupart des diplômés gagnent des salaires similaires.
 
-En revanche, la distribution de 2015 se caractérise par une étendue plus large et une densité plus faible. Ce profil suggère une hétérogénéité salariale plus marquée, qui pourrait être le résultat d'évolutions de carrière diversifiées parmi les diplômés. Après quelques années dans le monde professionnel, il est courant que les diplômés connaissent des chemins différents, influencés par une variété de facteurs tels que les progressions de carrière individuelles, les transitions sectorielles, les formations complémentaires ou les opportunités internationales.
+La distribution pour l'année 2022 se distingue nettement des deux précédentes. Elle présente une courbe plus aplatie avec une densité réduite, suggérant une variabilité plus grande dans les salaires des diplômés. Cela peut indiquer que les diplômés de 2022 ont connu des trajectoires professionnelles plus diversifiées ou que le marché de l'emploi a subi des changements significatifs, influençant ainsi les salaires de manière plus hétérogène. Des facteurs tels que des ajustements sectoriels, l'impact économique post-pandémie ou des tendances telles que la digitalisation et la transformation des compétences requises pourraient jouer un rôle.
 
-Cette variabilité accrue pour la cohorte de 2015 pourrait également refléter le fait que, avec le temps, certains diplômés bénéficient d'augmentations salariales grâce à des promotions ou des changements d'emploi qui reconnaissent leur expérience et leurs compétences accrues. Parallèlement, d'autres peuvent choisir des voies qui privilégient l'équilibre travail-vie personnelle ou l'engagement social, ce qui pourrait se traduire par des salaires moins élevés. De plus, il est possible que les secteurs d'activité qui embauchaient ces diplômés aient subi des transformations économiques, avec des secteurs en croissance offrant des rémunérations supérieures et d'autres, en décroissance ou en mutation, exerçant une pression à la baisse sur les salaires.
+La distribution plus large pour 2022 pourrait aussi refléter des opportunités salariales variables en raison d'une plus grande mobilité professionnelle ou de choix de carrière visant un équilibre entre vie professionnelle et personnelle. Les salaires élevés pourraient être attribués à des individus ayant rapidement gravi les échelons ou ayant bénéficié d'opportunités lucratives à l'étranger, tandis que d'autres pourraient avoir opté pour des rôles moins rémunérateurs mais plus satisfaisants sur le plan personnel ou social.
 
-L'analyse de ces distributions révèle donc non seulement les conditions initiales du marché de l'emploi pour les nouveaux diplômés, mais aussi l'impact à long terme des décisions professionnelles, des opportunités de marché et des trajectoires personnelles sur les résultats financiers. Cela souligne l'importance pour les institutions éducatives et les étudiants de considérer les tendances à long terme et les facteurs d'influence sur les salaires, au-delà des premières années suivant la graduation.
+En somme, l'analyse des distributions salariales des trois années révèle l'importance de considérer les conditions changeantes du marché de l'emploi et l'impact des choix professionnels individuels sur les salaires à long terme. Pour les institutions éducatives et les étudiants, il est crucial de prendre en compte ces éléments pour planifier les carrières et anticiper les potentiels financiers futurs.
 
 
 ### Disparité formation initiale/apprentissage/contrat de professionalisation
@@ -1986,7 +1916,7 @@ ordered_data$Anciennete_category <- cut(as.numeric(ordered_data$Anciennete), bre
 # Diagramme en barres pour la moyenne des salaires en fonction de l'ancienneté
 ggplot(ordered_data, aes(x = Anciennete_category, y = Salaire_annuel_brut_primes, fill = Anciennete_category)) +
   geom_bar(stat = "summary", fun = "mean", position = "dodge") +
-  labs(title = "Moyenne des salaires en fonction de l'ancienneté",
+  labs(title = "Moyenne des salaires en fonction de l'anciennetédans le monde du travail",
        x = "Ancienneté",
        y = "Moyenne du Salaire Annuel",
        fill = "Ancienneté") +
@@ -1997,7 +1927,6 @@ ggplot(ordered_data, aes(x = Anciennete_category, y = Salaire_annuel_brut_primes
 
 ```
 
-Idem que les années précédentes.
 
 
 ###Distribution du salaire selon le secteur
@@ -2075,69 +2004,29 @@ Globalement, ce graphique suggère que, bien que la médiane des salaires en Fra
 
 
 
-### Distribution du salaire en fonction du pays à l'étranger
-```{r etude112023, warning=FALSE}
-library(ggplot2)
+##Conclusion sur les différentes années
 
-# Calcul de la médiane des salaires par pays
-median_salaries <- tapply(raw_data_filtered$Salaire_annuel, raw_data_filtered$Pays, median)
-median_order <- names(sort(median_salaries))
-
-# Création d'un facteur pour l'ordre des pays par médiane
-emploiFactor <- factor(raw_data_filtered$Pays, levels = median_order)
-
-# Création du diagramme en bâtonnets
-ggplot(raw_data_filtered, aes(x = emploiFactor, y = Salaire_annuel, fill = emploiFactor)) +
-  geom_bar(stat = "summary", fun = "median", color = "white", size = 0.5) +
-  theme_minimal() +  # Fond blanc
-  theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 8),
-        panel.grid.major = element_blank(),
-        panel.grid.minor = element_blank()) +  # Suppression des lignes de grille
-  labs(title = "Médiane des Salaires par Pays", x = "Pays", y = "Médiane du Salaire Annuel",
-       fill = "Pays")  # Légende pour les couleurs des pays
+- Le genre : Dans l'ensemble, ces analyses annuelles montrent une tendance persistante d'écart salarial entre les hommes et les femmes, les hommes ayant généralement des salaires plus élevés. Bien que les distributions des salaires puissent varier d'une année à l'autre, la tendance à la disparité salariale entre les genres est cohérente. Cela peut être dû à divers facteurs, tels que la discrimination, les choix de carrière, l'éducation, l'expérience professionnelle, ou d'autres facteurs socio-économiques. Une analyse plus approfondie et des tests statistiques pour évaluer la signification de ces différences seraient nécessaires pour comprendre pleinement ces disparités salariales.
 
 
-```
+- L'année d'obtention du diplome: L'analyse des données sur plusieurs années met en évidence des tendances intéressantes. Dans l'ensemble, les données montrent que les salaires des diplômés de Polytech Montpellier varient avec le temps post-diplôme. Les diplômés les plus récents ont tendance à commencer avec des salaires plus bas, ce qui peut refléter des débuts de carrière à des niveaux d'entrée plus modestes. Avec l'expérience, les salaires ont tendance à augmenter, mais il existe également une variabilité croissante des salaires parmi les diplômés, ce qui peut être attribué à des trajectoires professionnelles diverses, des opportunités de marché changeantes et des choix personnels de carrière.
+
+Ces observations soulignent l'importance de prendre en compte l'évolution des conditions du marché de l'emploi et des choix de carrière individuels lors de la planification de carrière et de la gestion des finances personnelles. Il est également essentiel pour les institutions éducatives de fournir des informations pertinentes aux étudiants pour les aider à comprendre les réalités salariales dans leur domaine d'études et à prendre des décisions éclairées sur leur avenir professionnel. 
 
 
-Idem que les années précédentes.
+- Le secteur : L'analyse des données sur les salaires des diplômés de Polytech Montpellier montre une tendance générale où les diplômés du secteur privé ont tendance à gagner mieux que ceux du secteur public. Cependant, il existe des variations importantes en fonction de divers facteurs, notamment l'expérience, l'industrie et la spécialisation professionnelle. Le choix entre le secteur public et le secteur privé devrait être basé sur des considérations personnelles, professionnelles et de style de vie, en tenant compte des différences salariales potentielles.
 
 
-### Distribution des salaires en fonction de la région
-
-```{r distributionRegion2023}
-
-library(ggplot2)
-
-# Remove rows with non-finite values in Salaire_annuel
-raw_data <- raw_data[!is.na(raw_data$Salaire_annuel_brut_primes) & is.finite(raw_data$Salaire_annuel_brut_primes), ]
-
-# Remove rows with non-finite values in other numeric columns if needed
-# raw_data <- raw_data[complete.cases(raw_data[, numeric_cols]), ]
-
-# Calculate average salary by region
-avg_salary_by_region <- tapply(raw_data$Salaire_annuel_brut_primes, raw_data$Region, mean)
-max_avg_salary_region <- names(which.max(avg_salary_by_region))
-
-# Define a color palette for each region
-color_palette <- rainbow(length(unique(raw_data$Region)))
-
-# Plotting the distribution of salaries based on region as a pie chart
-ggplot(raw_data, aes(x = "", y = Salaire_annuel_brut_primes, fill = Region)) +
-  geom_bar(stat = "identity", width = 1) +
-  coord_polar("y") +
-  theme_void() +  # Removes unnecessary elements
-  labs(title = "Répartition des salaires par région",
-       fill = "Région",
-       y = "Salaire Annuel") +
-  scale_fill_manual(values = ifelse(raw_data$Region == max_avg_salary_region, "red", color_palette))  # Highlight region with highest average salary
+- L'anciennete: une plus grande ancienneté dans le milieu du travail est corrélée à des salaires moyens plus élevés, ce qui suggère que plus vous êtes ancien, plus vous avez de chances d'obtenir un meilleur salaire. Cependant, en 2022, des facteurs économiques ou des choix de carrière différents pourraient avoir contribué à des salaires plus variés pour les diplômés plus récents.
 
 
+- Le pays: En conclusion, pour toutes les années examinées, il apparaît qu'il existe un meilleur salaire moyen à l'étranger qu'en France pour les diplômés de Polytech Montpellier. Cette tendance suggère une corrélation entre le choix de travailler à l'étranger et des perspectives salariales plus favorables par rapport à une carrière en France.
 
+- Le type de contrat: En général, il est observé que les salariés en CDI ont des salaires moyens plus élevés que ceux en CDD. Cependant, pour d'autres types de contrats, il existe une diversité significative d'une année à l'autre, ce qui rend difficile toute comparaison directe des salaires.
 
-```
+- Le type de formation: Au fil du temps, on observe une évolution dans les salaires en fonction du type de formation. Initialement, la professionnalisation avait le salaire moyen le plus élevé, suivi de près par l'apprentissage, puis la formation initiale. Cependant, cette tendance a changé, avec une augmentation des salaires moyens pour l'apprentissage, suivi par la formation initiale, et enfin la professionnalisation. Cette transformation suggère un changement dans la valorisation des différents types de formation au fil des années.
 
-Idem que les années précédentes.
+- La filière: En ce qui concerne les filières, il est clair que le choix de la filière peut avoir un impact significatif sur le salaire. Les filières telles que IG, MSI, et MI ont tendance à présenter des médianes de salaire plus élevées, ainsi que des étendues plus importantes vers des salaires élevés. Cela suggère que ces filières peuvent offrir des opportunités de rémunération plus attractives pour les diplômés.
 
 
 
@@ -2405,6 +2294,7 @@ Nicolas :
 - Adaptation du script primaire en script final pour l'analyse globale des données.
 - Sélection des critères pour l'étude approfondie.
 - Création des scripts pour l'étude approfondie (ANOVA, AFC(M) et Régression Multiple).
+- Amélioration du site.
 
 Assia :
 - Tri de la moitié des données.
