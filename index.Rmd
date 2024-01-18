@@ -2,9 +2,13 @@
 title: "Etude des salaires des étudiants de Polytech Montpellier à la sortie des études"
 output:
   pdf_document: default
-
+  
 ---
+HANNOU Assia
+GOYON Nicolas
+PHILIPPE Tom
 
+lien de l'application web interactive: https://projetds.shinyapps.io/ProjetDataScience/
 
 # Introduction 
 
