@@ -185,8 +185,6 @@ activite_data <- filtered_data
 ```{r etude7, warning=FALSE}
 library(ggplot2)
 
-library(ggplot2)
-
 # Filtrage des données en excluant certaines catégories et en supprimant les lignes vides
 filtered_data <- subset(raw_data, !Nature_contrat %in% c("Apprentissage", "Autre", "ile-de-France", ""))
 filtered_data <- na.omit(filtered_data)
@@ -226,6 +224,8 @@ Globalement, ce graphique met en lumière les différences substantielles dans l
 ```{r etude8}
 
 library(ggplot2)
+
+ordered_data <- raw_data[order(as.numeric(raw_data$Anciennete)), ]
 
 # Création de catégories d'ancienneté (facultatif)
 ordered_data$Anciennete_category <- cut(as.numeric(ordered_data$Anciennete), breaks = 5)
@@ -601,6 +601,8 @@ En résumé, le type de contrat apparaît comme un facteur déterminant des pers
 
 library(ggplot2)
 
+ordered_data <- raw_data[order(as.numeric(raw_data$Anciennete)), ]
+
 # Création de catégories d'ancienneté (facultatif)
 ordered_data$Anciennete_category <- cut(as.numeric(ordered_data$Anciennete), breaks = 5)
 
@@ -965,6 +967,8 @@ En somme, ce graphique illustre les différences de rémunération associées à
 
 library(ggplot2)
 
+ordered_data <- raw_data[order(as.numeric(raw_data$Anciennete)), ]
+
 # Création de catégories d'ancienneté (facultatif)
 ordered_data$Anciennete_category <- cut(as.numeric(ordered_data$Anciennete), breaks = 5)
 
@@ -1313,6 +1317,9 @@ En résumé, le graphique met en exergue le fait que les CDI, tant nationaux qu'
 
 library(ggplot2)
 
+
+ordered_data <- raw_data[order(as.numeric(raw_data$Anciennete)), ]
+
 # Création de catégories d'ancienneté (facultatif)
 ordered_data$Anciennete_category <- cut(as.numeric(ordered_data$Anciennete), breaks = 5)
 
@@ -1644,11 +1651,13 @@ En résumé, le type de contrat apparaît comme un facteur déterminant des pers
 
 library(ggplot2)
 
+ordered_data <- raw_data[order(as.numeric(raw_data$Anciennete)), ]
+
 # Création de catégories d'ancienneté
 ordered_data$Anciennete_category <- cut(as.numeric(ordered_data$Anciennete), breaks = 5)
 
 # Diagramme en barres pour la moyenne des salaires en fonction de l'ancienneté
-ggplot(ordered_data, aes(x = Anciennete_category, y = Salaire_annuel, fill = Anciennete_category)) +
+ggplot(ordered_data, aes(x = Anciennete_category, y = Salaire_annuel_brut_primes, fill = Anciennete_category)) +
   geom_bar(stat = "summary", fun = "mean", position = "dodge") +
   labs(title = "Moyenne des salaires en fonction de l'ancienneté",
        x = "Ancienneté",
@@ -1970,11 +1979,14 @@ Ce diagramme illustre la diversité des situations salariales en fonction du typ
 
 library(ggplot2)
 
+
+ordered_data <- raw_data[order(as.numeric(raw_data$Anciennete)), ]
+
 # Création de catégories d'ancienneté (facultatif)
 ordered_data$Anciennete_category <- cut(as.numeric(ordered_data$Anciennete), breaks = 5)
 
 # Diagramme en barres pour la moyenne des salaires en fonction de l'ancienneté
-ggplot(ordered_data, aes(x = Anciennete_category, y = Salaire_annuel, fill = Anciennete_category)) +
+ggplot(ordered_data, aes(x = Anciennete_category, y = Salaire_annuel_brut_primes, fill = Anciennete_category)) +
   geom_bar(stat = "summary", fun = "mean", position = "dodge") +
   labs(title = "Moyenne des salaires en fonction de l'ancienneté",
        x = "Ancienneté",
